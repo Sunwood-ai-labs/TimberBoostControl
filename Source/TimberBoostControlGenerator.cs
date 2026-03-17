@@ -24,6 +24,13 @@ namespace Mods.TimberBoostControl
                 return GenerationResult.Fail("The mod directory is not initialized yet.");
             }
 
+            if (settings == null)
+            {
+                settings = new TimberBoostControlSettings();
+            }
+
+            settings.Normalize();
+
             var blueprintsZipPath = Path.Combine(Application.dataPath, "StreamingAssets", "Modding", "Blueprints.zip");
             if (!File.Exists(blueprintsZipPath))
             {
@@ -47,7 +54,7 @@ namespace Mods.TimberBoostControl
 
         private static void GenerateCharacterFiles(ZipArchive archive, TimberBoostControlSettings settings, ICollection<string> generatedFiles)
         {
-            if (!settings.CarryTenX && !settings.MoveTwoX)
+            if (settings.CarryMultiplier <= 1 && settings.MoveSpeedPercent == 100)
             {
                 return;
             }
@@ -62,18 +69,18 @@ namespace Mods.TimberBoostControl
 
                 var output = new JObject();
 
-                if (settings.CarryTenX)
+                if (settings.CarryMultiplier > 1)
                 {
                     var baseLiftingCapacity = GetIntValue(source, "GoodCarrierSpec.BaseLiftingCapacity");
                     if (baseLiftingCapacity.HasValue)
                     {
                         var goodCarrierSpec = new JObject();
-                        goodCarrierSpec["BaseLiftingCapacity"] = baseLiftingCapacity.Value * 10;
+                        goodCarrierSpec["BaseLiftingCapacity"] = baseLiftingCapacity.Value * settings.CarryMultiplier;
                         output["GoodCarrierSpec"] = goodCarrierSpec;
                     }
                 }
 
-                if (settings.MoveTwoX)
+                if (settings.MoveSpeedPercent != 100)
                 {
                     var walker = new JObject();
                     var baseWalkingSpeed = GetDoubleValue(source, "WalkerSpeedManagerSpec.BaseWalkingSpeed");
@@ -81,12 +88,12 @@ namespace Mods.TimberBoostControl
 
                     if (baseWalkingSpeed.HasValue)
                     {
-                        walker["BaseWalkingSpeed"] = Math.Round(baseWalkingSpeed.Value * 2.0, 3);
+                        walker["BaseWalkingSpeed"] = RoundWithTwoDecimalPlaces(baseWalkingSpeed.Value * settings.MoveSpeedPercent / 100.0);
                     }
 
                     if (baseSlowedSpeed.HasValue)
                     {
-                        walker["BaseSlowedSpeed"] = Math.Round(baseSlowedSpeed.Value * 2.0, 3);
+                        walker["BaseSlowedSpeed"] = RoundWithTwoDecimalPlaces(baseSlowedSpeed.Value * settings.MoveSpeedPercent / 100.0);
                     }
 
                     if (walker.HasValues)
@@ -105,11 +112,11 @@ namespace Mods.TimberBoostControl
 
         private static void GenerateBuildingFiles(ZipArchive archive, TimberBoostControlSettings settings, ICollection<string> generatedFiles)
         {
-            var hasBuildingTweaks = settings.BuildCostTenth ||
-                                    settings.FreeScience ||
-                                    settings.DoubleFactoryWorkers ||
-                                    settings.PowerTenth ||
-                                    settings.StorageTenX;
+            var hasBuildingTweaks = settings.BuildCostPercent != 100 ||
+                                    settings.ScienceCostPercent != 100 ||
+                                    settings.FactoryWorkerMultiplier > 1 ||
+                                    settings.PowerInputPercent != 100 ||
+                                    settings.StorageMultiplier > 1;
 
             if (!hasBuildingTweaks)
             {
@@ -143,12 +150,12 @@ namespace Mods.TimberBoostControl
 
                     var output = new JObject();
 
-                    if (settings.BuildCostTenth || settings.FreeScience)
+                    if (settings.BuildCostPercent != 100 || settings.ScienceCostPercent != 100)
                     {
                         var buildingSpec = new JObject();
                         var buildingSpecSource = source["BuildingSpec"] as JObject;
 
-                        if (settings.BuildCostTenth && buildingSpecSource != null)
+                        if (settings.BuildCostPercent != 100 && buildingSpecSource != null)
                         {
                             var buildingCost = buildingSpecSource["BuildingCost"] as JArray;
                             if (buildingCost != null && buildingCost.Count > 0)
@@ -159,7 +166,16 @@ namespace Mods.TimberBoostControl
                                     var amountToken = cost["Amount"];
                                     var amount = amountToken != null ? amountToken.Value<int>() : 0;
                                     var idToken = cost["Id"];
-                                    var newAmount = amount <= 0 ? 0 : Math.Max(1, (int)Math.Ceiling(amount / 10.0));
+                                    var newAmount = amount <= 0 ? 0 : (int)Math.Ceiling(amount * (settings.BuildCostPercent / 100.0));
+                                    if (settings.BuildCostPercent >= 100)
+                                    {
+                                        newAmount = amount;
+                                    }
+
+                                    if (settings.BuildCostPercent == 0 && amount > 0)
+                                    {
+                                        newAmount = 0;
+                                    }
                                     var replacementEntry = new JObject();
                                     replacementEntry["Id"] = idToken != null ? idToken.Value<string>() : string.Empty;
                                     replacementEntry["Amount"] = newAmount;
@@ -173,13 +189,14 @@ namespace Mods.TimberBoostControl
                             }
                         }
 
-                        if (settings.FreeScience && buildingSpecSource != null)
+                        if (settings.ScienceCostPercent != 100 && buildingSpecSource != null)
                         {
                             var scienceToken = buildingSpecSource["ScienceCost"];
                             var scienceCost = scienceToken != null ? (int?)scienceToken.Value<int>() : null;
-                            if (scienceCost.HasValue && scienceCost.Value > 0)
+                            if (scienceCost.HasValue)
                             {
-                                buildingSpec["ScienceCost"] = 0;
+                                var newScienceCost = (int)Math.Round(scienceCost.Value * (settings.ScienceCostPercent / 100.0), MidpointRounding.AwayFromZero);
+                                buildingSpec["ScienceCost"] = Math.Max(0, newScienceCost);
                             }
                         }
 
@@ -189,7 +206,7 @@ namespace Mods.TimberBoostControl
                         }
                     }
 
-                    if (settings.DoubleFactoryWorkers &&
+                    if (settings.FactoryWorkerMultiplier > 1 &&
                         source["WorkplaceSpec"] != null &&
                         source["WorkplaceSpec"].Type == JTokenType.Object &&
                         (source["ManufactorySpec"] != null || source["WorkshopSpec"] != null))
@@ -200,8 +217,8 @@ namespace Mods.TimberBoostControl
                         var defaultWorkersToken = workplaceSource["DefaultWorkers"];
                         var maxWorkers = maxWorkersToken != null ? (int?)maxWorkersToken.Value<int>() : null;
                         var defaultWorkers = defaultWorkersToken != null ? (int?)defaultWorkersToken.Value<int>() : null;
-                        var targetMaxWorkers = GetExpandedWorkerCount(source, maxWorkers);
-                        var targetDefaultWorkers = GetExpandedWorkerCount(source, defaultWorkers);
+                        var targetMaxWorkers = GetExpandedWorkerCount(source, maxWorkers, settings.FactoryWorkerMultiplier);
+                        var targetDefaultWorkers = GetExpandedWorkerCount(source, defaultWorkers, settings.FactoryWorkerMultiplier);
 
                         if (targetMaxWorkers.HasValue)
                         {
@@ -221,24 +238,32 @@ namespace Mods.TimberBoostControl
                         }
                     }
 
-                    if (settings.PowerTenth)
+                    if (settings.PowerInputPercent != 100)
                     {
                         var powerInput = GetDoubleValue(source, "MechanicalNodeSpec.PowerInput");
                         if (powerInput.HasValue && powerInput.Value > 0)
                         {
                             var mechanicalNodeSpec = new JObject();
-                            mechanicalNodeSpec["PowerInput"] = Math.Max(1, (int)Math.Ceiling(powerInput.Value / 10.0));
-                            output["MechanicalNodeSpec"] = mechanicalNodeSpec;
+                            var newPowerInput = (int)Math.Ceiling(powerInput.Value * (settings.PowerInputPercent / 100.0));
+                            if (newPowerInput > 0)
+                            {
+                                mechanicalNodeSpec["PowerInput"] = Math.Max(1, newPowerInput);
+                            }
+
+                            if (mechanicalNodeSpec.HasValues)
+                            {
+                                output["MechanicalNodeSpec"] = mechanicalNodeSpec;
+                            }
                         }
                     }
 
-                    if (settings.StorageTenX)
+                    if (settings.StorageMultiplier > 1)
                     {
                         var maxCapacity = GetIntValue(source, "StockpileSpec.MaxCapacity");
                         if (maxCapacity.HasValue)
                         {
                             var stockpileSpec = new JObject();
-                            stockpileSpec["MaxCapacity"] = maxCapacity.Value * 10;
+                            stockpileSpec["MaxCapacity"] = maxCapacity.Value * settings.StorageMultiplier;
                             output["StockpileSpec"] = stockpileSpec;
                         }
                     }
@@ -300,14 +325,14 @@ namespace Mods.TimberBoostControl
             return token.Value<double>();
         }
 
-        private static int? GetExpandedWorkerCount(JObject source, int? originalWorkers)
+        private static int? GetExpandedWorkerCount(JObject source, int? originalWorkers, int multiplier)
         {
             if (!originalWorkers.HasValue)
             {
                 return null;
             }
 
-            var targetWorkers = originalWorkers.Value * 2;
+            var targetWorkers = originalWorkers.Value * multiplier;
             var capacityLimit = GetFinishedCapacityLimit(source);
             if (capacityLimit.HasValue)
             {
@@ -315,6 +340,11 @@ namespace Mods.TimberBoostControl
             }
 
             return targetWorkers > originalWorkers.Value ? (int?)targetWorkers : null;
+        }
+
+        private static double RoundWithTwoDecimalPlaces(double value)
+        {
+            return Math.Round(value, 3, MidpointRounding.AwayFromZero);
         }
 
         private static int? GetFinishedCapacityLimit(JObject source)
