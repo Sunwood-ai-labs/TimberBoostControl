@@ -55,6 +55,7 @@ powershell -ExecutionPolicy Bypass -File .\build.ps1 -GameRoot "C:\Path\To\Timbe
 
 1. Build `Code.dll`.
 2. Copy this folder into `Documents\Timberborn\Mods\TimberBoostControl`, or create a junction to it.
+   Current local setup uses a junction from `C:\Users\Aslan\OneDrive\ドキュメント\Timberborn\Mods\TimberBoostControl` to `D:\Prj\TimberBoostControl`.
 3. Restart Timberborn and enable the mod in Mod Manager.
 4. Enter a save, use the bottom-right settings panel, and click `Save`.
 5. Restart the game again to apply the generated blueprint changes.

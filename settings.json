@@ -5,5 +5,6 @@
   "BuildCostTenth": false,
   "FreeScience": false,
   "DoubleFactoryWorkers": false,
-  "PowerTenth": false
+  "PowerTenth": false,
+  "PanelCollapsed": false
 }
