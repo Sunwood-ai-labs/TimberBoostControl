@@ -1,0 +1,8 @@
+Code.dll
+Code.test.dll
+build.rsp
+.generated-files.txt
+Buildings/
+Characters/
+.vs/
+*.user
