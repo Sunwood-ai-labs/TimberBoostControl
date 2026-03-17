@@ -200,15 +200,19 @@ namespace Mods.TimberBoostControl
                         var defaultWorkersToken = workplaceSource["DefaultWorkers"];
                         var maxWorkers = maxWorkersToken != null ? (int?)maxWorkersToken.Value<int>() : null;
                         var defaultWorkers = defaultWorkersToken != null ? (int?)defaultWorkersToken.Value<int>() : null;
+                        var targetMaxWorkers = GetExpandedWorkerCount(source, maxWorkers);
+                        var targetDefaultWorkers = GetExpandedWorkerCount(source, defaultWorkers);
 
-                        if (maxWorkers.HasValue)
+                        if (targetMaxWorkers.HasValue)
                         {
-                            workplaceSpec["MaxWorkers"] = maxWorkers.Value * 2;
+                            workplaceSpec["MaxWorkers"] = targetMaxWorkers.Value;
                         }
 
-                        if (defaultWorkers.HasValue)
+                        if (targetDefaultWorkers.HasValue)
                         {
-                            workplaceSpec["DefaultWorkers"] = defaultWorkers.Value * 2;
+                            workplaceSpec["DefaultWorkers"] = targetMaxWorkers.HasValue
+                                ? Math.Min(targetDefaultWorkers.Value, targetMaxWorkers.Value)
+                                : targetDefaultWorkers.Value;
                         }
 
                         if (workplaceSpec.HasValues)
@@ -294,6 +298,41 @@ namespace Mods.TimberBoostControl
             }
 
             return token.Value<double>();
+        }
+
+        private static int? GetExpandedWorkerCount(JObject source, int? originalWorkers)
+        {
+            if (!originalWorkers.HasValue)
+            {
+                return null;
+            }
+
+            var targetWorkers = originalWorkers.Value * 2;
+            var capacityLimit = GetFinishedCapacityLimit(source);
+            if (capacityLimit.HasValue)
+            {
+                targetWorkers = Math.Min(targetWorkers, capacityLimit.Value);
+            }
+
+            return targetWorkers > originalWorkers.Value ? (int?)targetWorkers : null;
+        }
+
+        private static int? GetFinishedCapacityLimit(JObject source)
+        {
+            var enterableSpec = source["EnterableSpec"] as JObject;
+            if (enterableSpec == null)
+            {
+                return null;
+            }
+
+            var limitedCapacityToken = enterableSpec["LimitedCapacityFinished"];
+            var capacityToken = enterableSpec["CapacityFinished"];
+            if (limitedCapacityToken == null || capacityToken == null || !limitedCapacityToken.Value<bool>())
+            {
+                return null;
+            }
+
+            return capacityToken.Value<int>();
         }
 
         private static List<string> ReadTrackedFiles()
