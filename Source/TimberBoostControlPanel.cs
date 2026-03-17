@@ -8,7 +8,6 @@ namespace Mods.TimberBoostControl
 {
     public sealed class TimberBoostControlPanel : ILoadableSingleton
     {
-        private const int CollapsedWidth = 220;
         private const int ExpandedWidth = 360;
 
         private readonly TimberBoostControlGenerator _generator;
@@ -20,9 +19,6 @@ namespace Mods.TimberBoostControl
         private Label _buildCostTenthStateLabel;
         private Button _carryTenXButton;
         private Label _carryTenXStateLabel;
-        private Label _collapsedSummaryLabel;
-        private Button _collapseButton;
-        private VisualElement _content;
         private TimberBoostControlSettings _currentSettings;
         private Button _doubleFactoryWorkersButton;
         private Label _doubleFactoryWorkersStateLabel;
@@ -30,13 +26,13 @@ namespace Mods.TimberBoostControl
         private Label _freeScienceStateLabel;
         private Button _moveTwoXButton;
         private Label _moveTwoXStateLabel;
-        private bool _panelCollapsed;
         private Button _powerTenthButton;
         private Label _powerTenthStateLabel;
         private VisualElement _root;
         private Label _statusLabel;
         private Button _storageTenXButton;
         private Label _storageTenXStateLabel;
+        private bool _visible;
 
         public TimberBoostControlPanel(
             UILayout uiLayout,
@@ -54,11 +50,23 @@ namespace Mods.TimberBoostControl
         {
             var settings = _settingsStore.Load();
             _currentSettings = CloneSettings(settings);
-            var root = BuildRoot(settings);
+            var root = BuildRoot();
             _uiLayout.AddBottomRight(root, 150);
+            SetVisible(false);
+            UpdateStatus(string.Format("Loaded settings. Selected: {0} option(s).", _currentSettings.EnabledCount));
         }
 
-        private VisualElement BuildRoot(TimberBoostControlSettings settings)
+        public void ToggleVisibility()
+        {
+            SetVisible(!_visible);
+        }
+
+        public void Hide()
+        {
+            SetVisible(false);
+        }
+
+        private VisualElement BuildRoot()
         {
             _root = new VisualElement();
             _root.style.width = ExpandedWidth;
@@ -86,25 +94,16 @@ namespace Mods.TimberBoostControl
             title.style.flexGrow = 1;
             header.Add(title);
 
-            _collapseButton = CreateHeaderButton("Hide", ToggleCollapsedClicked);
-            header.Add(_collapseButton);
+            var closeButton = CreateHeaderButton("Close", Hide);
+            header.Add(closeButton);
             _root.Add(header);
 
-            _collapsedSummaryLabel = new Label();
-            _collapsedSummaryLabel.style.whiteSpace = WhiteSpace.Normal;
-            _collapsedSummaryLabel.style.fontSize = 11;
-            _collapsedSummaryLabel.style.color = new Color(0.87f, 0.94f, 0.9f);
-            _collapsedSummaryLabel.style.marginBottom = 6;
-            _root.Add(_collapsedSummaryLabel);
-
-            _content = new VisualElement();
-
-            var description = new Label("Click a row to toggle it. Save writes blueprint tweaks into this mod folder, and the game must be restarted after saving.");
+            var description = new Label("Open this panel from the bottom bar Boost button. Click a row to toggle it, then Save and restart the game.");
             description.style.whiteSpace = WhiteSpace.Normal;
             description.style.color = new Color(0.83f, 0.9f, 0.86f);
             description.style.fontSize = 11;
             description.style.marginBottom = 8;
-            _content.Add(description);
+            _root.Add(description);
 
             _carryTenXButton = CreateOptionButton("10x carry capacity", ToggleCarryTenXClicked, out _carryTenXStateLabel);
             _moveTwoXButton = CreateOptionButton("2x move speed", ToggleMoveTwoXClicked, out _moveTwoXStateLabel);
@@ -114,13 +113,13 @@ namespace Mods.TimberBoostControl
             _doubleFactoryWorkersButton = CreateOptionButton("2x factory workers", ToggleDoubleFactoryWorkersClicked, out _doubleFactoryWorkersStateLabel);
             _powerTenthButton = CreateOptionButton("1/10 power input", TogglePowerTenthClicked, out _powerTenthStateLabel);
 
-            _content.Add(_carryTenXButton);
-            _content.Add(_moveTwoXButton);
-            _content.Add(_storageTenXButton);
-            _content.Add(_buildCostTenthButton);
-            _content.Add(_freeScienceButton);
-            _content.Add(_doubleFactoryWorkersButton);
-            _content.Add(_powerTenthButton);
+            _root.Add(_carryTenXButton);
+            _root.Add(_moveTwoXButton);
+            _root.Add(_storageTenXButton);
+            _root.Add(_buildCostTenthButton);
+            _root.Add(_freeScienceButton);
+            _root.Add(_doubleFactoryWorkersButton);
+            _root.Add(_powerTenthButton);
 
             var buttons = new VisualElement();
             buttons.style.flexDirection = FlexDirection.Row;
@@ -135,7 +134,7 @@ namespace Mods.TimberBoostControl
             buttons.Add(saveButton);
             buttons.Add(reloadButton);
             buttons.Add(resetButton);
-            _content.Add(buttons);
+            _root.Add(buttons);
 
             _statusLabel = new Label();
             _statusLabel.style.whiteSpace = WhiteSpace.Normal;
@@ -150,13 +149,9 @@ namespace Mods.TimberBoostControl
             _statusLabel.style.borderTopRightRadius = 6;
             _statusLabel.style.borderBottomLeftRadius = 6;
             _statusLabel.style.borderBottomRightRadius = 6;
-            _content.Add(_statusLabel);
-
-            _root.Add(_content);
+            _root.Add(_statusLabel);
 
             RefreshOptionRows();
-            ApplyCollapsedState(settings.PanelCollapsed);
-            UpdateStatus(string.Format("Loaded settings. Selected: {0} option(s).", CollectSettings().EnabledCount));
             return _root;
         }
 
@@ -235,7 +230,7 @@ namespace Mods.TimberBoostControl
                 text = text
             };
             button.style.height = 24;
-            button.style.minWidth = 62;
+            button.style.minWidth = 68;
             button.style.color = Color.white;
             button.style.backgroundColor = new Color(0.2f, 0.29f, 0.26f, 1f);
             button.style.unityFontStyleAndWeight = FontStyle.Bold;
@@ -268,27 +263,20 @@ namespace Mods.TimberBoostControl
         {
             var settings = _settingsStore.Load();
             ApplySettings(settings);
-            ApplyCollapsedState(settings.PanelCollapsed);
             UpdateStatus(string.Format("Reloaded settings from disk. Selected: {0} option(s).", settings.EnabledCount));
             _quickNotificationService.SendNotification("TimberBoostControl reloaded its saved settings.");
         }
 
         private void ResetClicked()
         {
-            var settings = new TimberBoostControlSettings
-            {
-                PanelCollapsed = _panelCollapsed
-            };
-            ApplySettings(settings);
+            ApplySettings(new TimberBoostControlSettings());
             UpdateStatus("Reset the UI to defaults. Click Save to rewrite generated files.");
             _quickNotificationService.SendNotification("TimberBoostControl reset its UI values.");
         }
 
         private TimberBoostControlSettings CollectSettings()
         {
-            var settings = CloneSettings(_currentSettings);
-            settings.PanelCollapsed = _panelCollapsed;
-            return settings;
+            return CloneSettings(_currentSettings);
         }
 
         private void ApplySettings(TimberBoostControlSettings settings)
@@ -297,37 +285,20 @@ namespace Mods.TimberBoostControl
             RefreshOptionRows();
         }
 
+        private void SetVisible(bool visible)
+        {
+            _visible = visible;
+            _root.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+
         private void UpdateStatus(string message)
         {
             _statusLabel.text = message;
         }
 
-        private void ApplyCollapsedState(bool collapsed)
-        {
-            _panelCollapsed = collapsed;
-            _content.style.display = collapsed ? DisplayStyle.None : DisplayStyle.Flex;
-            _collapseButton.text = collapsed ? "Show" : "Hide";
-            _root.style.width = collapsed ? CollapsedWidth : ExpandedWidth;
-            _collapsedSummaryLabel.style.display = collapsed ? DisplayStyle.Flex : DisplayStyle.None;
-            UpdateCollapsedSummary();
-        }
-
-        private void PersistPanelState()
-        {
-            var settings = _settingsStore.Load();
-            settings.PanelCollapsed = _panelCollapsed;
-            _settingsStore.Save(settings);
-        }
-
         private void RefreshSelectionStatus()
         {
             UpdateStatus(string.Format("Selected: {0} option(s). Click Save to write blueprint files.", CollectSettings().EnabledCount));
-        }
-
-        private void ToggleCollapsedClicked()
-        {
-            ApplyCollapsedState(!_panelCollapsed);
-            PersistPanelState();
         }
 
         private void ToggleCarryTenXClicked()
@@ -388,12 +359,6 @@ namespace Mods.TimberBoostControl
             UpdateOptionButton(_freeScienceButton, _freeScienceStateLabel, _currentSettings.FreeScience);
             UpdateOptionButton(_doubleFactoryWorkersButton, _doubleFactoryWorkersStateLabel, _currentSettings.DoubleFactoryWorkers);
             UpdateOptionButton(_powerTenthButton, _powerTenthStateLabel, _currentSettings.PowerTenth);
-            UpdateCollapsedSummary();
-        }
-
-        private void UpdateCollapsedSummary()
-        {
-            _collapsedSummaryLabel.text = string.Format("{0} option(s) selected. Click Show to reopen.", CollectSettings().EnabledCount);
         }
 
         private static TimberBoostControlSettings CloneSettings(TimberBoostControlSettings settings)
@@ -411,8 +376,7 @@ namespace Mods.TimberBoostControl
                 BuildCostTenth = settings.BuildCostTenth,
                 FreeScience = settings.FreeScience,
                 DoubleFactoryWorkers = settings.DoubleFactoryWorkers,
-                PowerTenth = settings.PowerTenth,
-                PanelCollapsed = settings.PanelCollapsed
+                PowerTenth = settings.PowerTenth
             };
         }
 

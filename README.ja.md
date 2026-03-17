@@ -6,7 +6,7 @@ TimberBoostControl は、Timberborn の `C# DLL MOD` と小さな `ゲーム内�
 
 ## ✨ 特徴
 
-- ゲーム中の右下に設定パネルを表示
+- ゲーム下部の `Boost` ボタンから設定パネルを開ける
 - 設定内容を `settings.json` に保存
 - MOD フォルダ内に実行用の blueprint override を生成
 - 生成したファイルを `.generated-files.txt` で追跡
@@ -57,7 +57,7 @@ powershell -ExecutionPolicy Bypass -File .\build.ps1 -GameRoot "C:\Path\To\Timbe
 2. このフォルダを `Documents\Timberborn\Mods\TimberBoostControl` にコピーするか、ジャンクションでつなぎます。
    現在のローカル環境では、`C:\Users\Aslan\OneDrive\ドキュメント\Timberborn\Mods\TimberBoostControl` から `D:\Prj\TimberBoostControl` へのジャンクションで運用しています。
 3. Timberborn を再起動して、Mod Manager でこの MOD を有効化します。
-4. セーブデータに入り、右下の設定パネルで項目を選んで `Save` を押します。
+4. セーブデータに入り、下部バーの `Boost` ボタンを押して設定パネルを開き、項目を選んで `Save` を押します。
 5. もう一度ゲームを再起動すると、生成された blueprint 変更が反映されます。
 
 ## 🧪 補足

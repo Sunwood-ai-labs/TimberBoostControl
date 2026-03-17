@@ -1,4 +1,5 @@
 using Bindito.Core;
+using Timberborn.BottomBarSystem;
 
 namespace Mods.TimberBoostControl
 {
@@ -10,6 +11,8 @@ namespace Mods.TimberBoostControl
             Bind<TimberBoostControlSettingsStore>().AsSingleton();
             Bind<TimberBoostControlGenerator>().AsSingleton();
             Bind<TimberBoostControlPanel>().AsSingleton();
+            Bind<TimberBoostControlBottomBarButton>().AsSingleton();
+            MultiBind<BottomBarModule>().ToProvider<TimberBoostControlBottomBarModuleProvider>().AsSingleton();
         }
     }
 }

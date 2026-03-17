@@ -18,8 +18,6 @@ namespace Mods.TimberBoostControl
 
         public bool PowerTenth { get; set; }
 
-        public bool PanelCollapsed { get; set; }
-
         [JsonIgnore]
         public int EnabledCount
         {

@@ -49,6 +49,7 @@ $references = @(
     (Join-Path $managedDir "Bindito.Core.dll"),
     (Join-Path $managedDir "Newtonsoft.Json.dll"),
     (Join-Path $managedDir "System.Memory.dll"),
+    (Join-Path $managedDir "Timberborn.BottomBarSystem.dll"),
     (Join-Path $managedDir "Timberborn.ModManagerScene.dll"),
     (Join-Path $managedDir "Timberborn.QuickNotificationSystem.dll"),
     (Join-Path $managedDir "Timberborn.SingletonSystem.dll"),

@@ -6,7 +6,7 @@ TimberBoostControl is a practice Timberborn mod that combines a C# DLL mod with 
 
 ## ✨ Features
 
-- Adds a settings panel to the bottom-right corner during gameplay
+- Adds a `Boost` launcher button to the bottom bar and opens the settings panel from it
 - Saves options to `settings.json`
 - Generates runtime blueprint override files inside the mod folder
 - Keeps track of generated files in `.generated-files.txt`
@@ -57,7 +57,7 @@ powershell -ExecutionPolicy Bypass -File .\build.ps1 -GameRoot "C:\Path\To\Timbe
 2. Copy this folder into `Documents\Timberborn\Mods\TimberBoostControl`, or create a junction to it.
    Current local setup uses a junction from `C:\Users\Aslan\OneDrive\ドキュメント\Timberborn\Mods\TimberBoostControl` to `D:\Prj\TimberBoostControl`.
 3. Restart Timberborn and enable the mod in Mod Manager.
-4. Enter a save, use the bottom-right settings panel, and click `Save`.
+4. Enter a save, click the `Boost` button on the bottom bar, choose your options, and click `Save`.
 5. Restart the game again to apply the generated blueprint changes.
 
 ## 🧪 Notes
