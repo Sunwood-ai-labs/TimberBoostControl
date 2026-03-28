@@ -1,0 +1,19 @@
+{
+  "name": "timberboostcontrol",
+  "private": true,
+  "description": "Docs and repository QA tooling for the TimberBoostControl Timberborn mod.",
+  "license": "MIT",
+  "scripts": {
+    "validate:project": "node scripts/validate-project.js",
+    "lint:md": "markdownlint-cli2 --config .markdownlint.json README.md README.ja.md docs/**/*.md",
+    "lint:repo": "powershell -ExecutionPolicy Bypass -File ./scripts/validate-repo.ps1",
+    "docs:dev": "vitepress dev docs --host 0.0.0.0",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs --host 0.0.0.0",
+    "validate": "npm run validate:project && npm run lint:repo && npm run lint:md && npm run docs:build"
+  },
+  "devDependencies": {
+    "markdownlint-cli2": "0.15.0",
+    "vitepress": "1.6.4"
+  }
+}

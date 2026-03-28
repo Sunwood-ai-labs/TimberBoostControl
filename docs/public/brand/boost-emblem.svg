@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">TimberBoostControl emblem</title>
+  <desc id="desc">A timber-toned rocket inside a circular boost ring.</desc>
+  <defs>
+    <linearGradient id="bg" x1="48" x2="208" y1="40" y2="216" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#214639" />
+      <stop offset="1" stop-color="#10251e" />
+    </linearGradient>
+    <linearGradient id="body" x1="82" x2="182" y1="52" y2="196" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e7a55e" />
+      <stop offset="1" stop-color="#a55f2e" />
+    </linearGradient>
+    <linearGradient id="ring" x1="54" x2="194" y1="64" y2="210" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f0b56e" />
+      <stop offset="1" stop-color="#e46d2d" />
+    </linearGradient>
+  </defs>
+  <circle cx="128" cy="128" r="108" fill="url(#bg)" />
+  <circle cx="128" cy="128" r="92" fill="none" stroke="#315f50" stroke-width="6" opacity="0.85" />
+  <path d="M77 171c-18 8-30 23-35 45 20-5 37-17 47-34l-12-11z" fill="url(#ring)" />
+  <path d="M143 42c44 24 71 68 71 113 0 10-1 20-4 30l-48-7-43-92 24-44z" fill="url(#body)" />
+  <path d="M117 74c-33 21-56 58-61 100l27 25 47-21 55-9c1-5 1-10 1-14 0-33-17-66-43-87l-26 6z" fill="#b06a36" />
+  <path d="M92 199 65 175l-18 42c21-2 35-9 45-18z" fill="#d88843" />
+  <path d="M171 92c14 16 24 38 24 61 0 6-1 12-2 17l27 5c3-9 4-19 4-29 0-34-18-68-53-94v40z" fill="#8d4d27" opacity="0.9" />
+  <circle cx="154" cy="92" r="18" fill="#f6e8cb" />
+  <circle cx="154" cy="92" r="10" fill="#cfb58e" opacity="0.65" />
+  <path d="M75 173 59 157l10-36 45-47 16 16-55 83z" fill="#7f4727" opacity="0.55" />
+</svg>

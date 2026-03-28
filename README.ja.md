@@ -1,67 +1,120 @@
-# TimberBoostControl
+<div align="center">
+  <img src="./docs/public/brand/boost-emblem.svg" alt="TimberBoostControl emblem" width="156" />
+  <h1>TimberBoostControl</h1>
+  <p><strong>bottom bar から <code>settings.json</code> を再読み込みし、blueprint boost を再生成できる Timberborn DLL MOD です。</strong></p>
+</div>
 
-[English](./README.md)
+<p align="center">
+  <img alt="Timberborn 1.0+" src="https://img.shields.io/badge/Timberborn-1.0%2B-7d5632?style=flat-square" />
+  <img alt="C# DLL mod" src="https://img.shields.io/badge/C%23-DLL%20mod-355f9d?style=flat-square" />
+  <img alt="Docs with VitePress" src="https://img.shields.io/badge/Docs-VitePress-2b6cb0?style=flat-square" />
+  <img alt="License MIT" src="https://img.shields.io/badge/License-MIT-246b54?style=flat-square" />
+</p>
 
-TimberBoostControl は、Timberborn の `C# DLL MOD` と小さな `ゲーム内設定UI` を組み合わせた練習用プロジェクトです。固定のバランスMODを1つ配るのではなく、ゲーム中にいくつかの調整項目を切り替え、その内容に合わせた `.blueprint.json` を MOD フォルダへ自動生成します。
+<p align="center">
+  <a href="./README.md">English</a>
+  |
+  <a href="./README.ja.md">日本語</a>
+</p>
 
-## ✨ 特徴
+<p align="center">
+  <a href="https://sunwood-ai-labs.github.io/TimberBoostControl/">Documentation</a>
+  |
+  <a href="https://github.com/Sunwood-ai-labs/TimberBoostControl">GitHub</a>
+</p>
 
-- ゲーム下部の `Boost` ボタンから設定パネルを開ける
-- 設定内容を `settings.json` に保存
-- MOD フォルダ内に実行用の blueprint override を生成
-- 生成したファイルを `.generated-files.txt` で追跡
-- セーブ後にゲーム再起動すると変更が反映
+## 🚀 概要
 
-現在切り替えられる項目です。
+TimberBoostControl は、C# DLL MOD と生成済み `.blueprint.json` override を組み合わせた Timberborn 用の学習向け MOD です。固定プリセットを焼き込むのではなく、`settings.json` の数値を読み取り、その値を bottom bar のパネルで確認しながら、対応する blueprint override を再生成できます。
 
-- `10x carry capacity`
-- `2x move speed`
-- `10x storage capacity`
-- `1/10 building cost`
-- `0 science cost`
-- `2x factory workers`
-- `1/10 power input`
+## ✨ できること
 
-## 🗂️ 構成
+- Timberborn の bottom bar に `Boost` ランチャーを追加する
+- MOD フォルダ内の `settings.json` を読み込み、正規化する
+- 読み取り専用のゲーム内パネルに現在値と解決済みパスを表示する
+- JSON の現在値からキャラクターと建物の blueprint override を再生成する
+- `.generated-files.txt` で生成ファイルを追跡し、次回再生成時に安全に置き換える
 
-- `Source/`: DLL MOD の C# ソース
-- `build.ps1`: `Code.dll` をビルドするスクリプト
-- `manifest.json`: Timberborn の MOD マニフェスト
-- `settings.json`: UI の初期保存設定
+主な設定グループ:
 
-`Buildings/`、`Characters/`、`Code.dll`、`.generated-files.txt` などの生成物は git では追跡しません。
+- `CarryMultiplier`
+- `MoveSpeedPercent`
+- `StorageMultiplier`
+- `BuildCostPercent`
+- `ScienceCostPercent`
+- `FactoryWorkerMultiplier`
+- `PowerInputPercent`
 
-## 🔧 ビルド方法
+互換性のため JSON キー名は `FactoryWorkerMultiplier` のままですが、現在の UI では適用範囲に合わせて `Workplace workers` と表示しています。
 
-必要なものです。
+## 🧭 実行フロー
+
+1. MOD の起動時に作業ディレクトリを解決します。
+2. `settings.json` が無ければ自動作成します。
+3. スターターが現在の設定から blueprint override を再生成します。
+4. ゲーム中は bottom bar のランチャーから現在値を確認できます。
+5. `settings.json` を編集し、`Reload settings.json` を押してから Timberborn を再起動すると、再生成した内容を完全に反映できます。
+
+## 🛠️ ビルド
+
+必要なもの:
 
 - Windows
-- ローカルにインストールされた Timberborn 1.0.x
-- `C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe` が使える環境
+- ローカルにインストールされた Timberborn `1.0.x`
+- `C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe` にある `.NET Framework` の C# コンパイラ
 
-DLL をビルドします。
+DLL のビルド:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\build.ps1
 ```
 
-Timberborn の場所が標準パスと違う場合は、`-GameRoot` を渡してください。
+Timberborn が標準とは別の場所にある場合は、`-GameRoot` を指定します。
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\build.ps1 -GameRoot "C:\Path\To\Timberborn"
 ```
 
-## 🚀 使い方
+## 🎮 導入と使い方
 
 1. `Code.dll` をビルドします。
-2. このフォルダを `Documents\Timberborn\Mods\TimberBoostControl` にコピーするか、ジャンクションでつなぎます。
-   現在のローカル環境では、`C:\Users\Aslan\OneDrive\ドキュメント\Timberborn\Mods\TimberBoostControl` から `D:\Prj\TimberBoostControl` へのジャンクションで運用しています。
-3. Timberborn を再起動して、Mod Manager でこの MOD を有効化します。
-4. セーブデータに入り、下部バーの `Boost` ボタンを押して設定パネルを開き、項目を選んで `Save` を押します。
-5. もう一度ゲームを再起動すると、生成された blueprint 変更が反映されます。
+2. このリポジトリを `Documents\Timberborn\Mods\TimberBoostControl` にコピーするか、そこへ向けたジャンクションを作成します。
+3. Timberborn の Mod Manager で有効化します。
+4. bottom bar の `Boost` ランチャーを開きます。
+5. 値を変更したいときは `settings.json` を直接編集します。
+6. パネルの `Reload settings.json` を押します。
+7. 再生成された gameplay data を反映するため、ゲームを再起動します。
 
-## 🧪 補足
+## 📚 ドキュメント
 
-- `IModStarter`、`Configurator`、`ILoadableSingleton`、`UILayout` の練習用サンプルとして作っています。
-- 値をメモリ上で直接差し替えるのではなく、元 blueprint を読んで JSON override を生成する方式です。
-- 設定を変えて `Save` し直せば、生成ファイルは安全に作り直されます。
+- [導入ガイド](https://sunwood-ai-labs.github.io/TimberBoostControl/ja/getting-started)
+- [設定](https://sunwood-ai-labs.github.io/TimberBoostControl/ja/settings)
+- [アーキテクチャ](https://sunwood-ai-labs.github.io/TimberBoostControl/ja/architecture)
+- [トラブルシューティング](https://sunwood-ai-labs.github.io/TimberBoostControl/ja/troubleshooting)
+
+## 📁 リポジトリ構成
+
+- `Source/`: DLL MOD の C# ソース
+- `Assets/`: ランチャーアイコンなどの runtime UI 資産
+- `docs/`: VitePress ベースのドキュメントサイト
+- `scripts/validate-repo.ps1`: リポジトリ整備用の構造 QA スクリプト
+- `build.ps1`: `Code.dll` をビルドするローカルスクリプト
+- `manifest.json`: Timberborn MOD マニフェスト
+- `settings.json`: MOD が読み込む永続設定ファイル
+
+`Buildings/`、`Characters/`、`Code.dll`、`.generated-files.txt` などの生成物は意図的に git 管理外です。
+
+## 🧪 リポジトリ QA
+
+Node 依存を一度入れたあと、公開面は次のコマンドで確認できます。
+
+```powershell
+npm install
+npm run validate
+```
+
+## 📝 補足
+
+- このリポジトリは `IModStarter`、`Configurator`、`ILoadableSingleton`、`UILayout`、そして JSON 駆動のコンテンツ生成を学ぶ題材として作られています。
+- gameplay 値をメモリ上で直接書き換えるのではなく、MOD フォルダに override ファイルを書き出す方式です。
+- 古いローカル設定ファイルが残っていても、legacy boolean キーを読み替えられます。

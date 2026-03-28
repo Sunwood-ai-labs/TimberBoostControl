@@ -1,43 +1,67 @@
-# TimberBoostControl
+<div align="center">
+  <img src="./docs/public/brand/boost-emblem.svg" alt="TimberBoostControl emblem" width="156" />
+  <h1>TimberBoostControl</h1>
+  <p><strong>A Timberborn DLL mod that reloads <code>settings.json</code> and regenerates blueprint boosts from a bottom-bar workflow.</strong></p>
+</div>
 
-[日本語](./README.ja.md)
+<p align="center">
+  <img alt="Timberborn 1.0+" src="https://img.shields.io/badge/Timberborn-1.0%2B-7d5632?style=flat-square" />
+  <img alt="C# DLL mod" src="https://img.shields.io/badge/C%23-DLL%20mod-355f9d?style=flat-square" />
+  <img alt="Docs with VitePress" src="https://img.shields.io/badge/Docs-VitePress-2b6cb0?style=flat-square" />
+  <img alt="License MIT" src="https://img.shields.io/badge/License-MIT-246b54?style=flat-square" />
+</p>
 
-TimberBoostControl is a practice Timberborn mod that combines a C# DLL mod with a small in-game settings panel. Instead of hardcoding one balance preset, it lets you toggle a few blueprint tweaks during a playthrough and then writes the matching `.blueprint.json` overrides into the mod folder.
+<p align="center">
+  <a href="./README.md">English</a>
+  |
+  <a href="./README.ja.md">日本語</a>
+</p>
 
-## ✨ Features
+<p align="center">
+  <a href="https://sunwood-ai-labs.github.io/TimberBoostControl/">Documentation</a>
+  |
+  <a href="https://github.com/Sunwood-ai-labs/TimberBoostControl">GitHub</a>
+</p>
 
-- Adds a `Boost` launcher button to the bottom bar and opens the settings panel from it
-- Saves options to `settings.json`
-- Generates runtime blueprint override files inside the mod folder
-- Keeps track of generated files in `.generated-files.txt`
-- Requires a game restart after saving to apply gameplay changes
+## 🚀 Overview
 
-Current toggles:
+TimberBoostControl is a practice Timberborn mod that combines a C# DLL mod with generated `.blueprint.json` overrides. Instead of locking the mod to one hardcoded preset, it reads numeric values from `settings.json`, shows those values in a bottom-bar panel, and regenerates the matching blueprint overrides whenever you reload the file.
 
-- `10x carry capacity`
-- `2x move speed`
-- `10x storage capacity`
-- `1/10 building cost`
-- `0 science cost`
-- `2x factory workers`
-- `1/10 power input`
+## ✨ What It Changes
 
-## 🗂️ Repository Layout
+- Adds a `Boost` launcher to the Timberborn bottom bar.
+- Loads and normalizes `settings.json` inside the mod folder.
+- Shows the current values and resolved settings path in a read-only in-game panel.
+- Regenerates blueprint overrides for characters and buildings from the current JSON values.
+- Tracks generated files in `.generated-files.txt` so they can be replaced cleanly on the next pass.
 
-- `Source/`: C# sources for the DLL mod
-- `build.ps1`: local build script for `Code.dll`
-- `manifest.json`: Timberborn mod manifest
-- `settings.json`: default saved settings for the UI
+Supported value groups:
 
-Generated outputs such as `Buildings/`, `Characters/`, `Code.dll`, and `.generated-files.txt` are intentionally not tracked in git.
+- `CarryMultiplier`
+- `MoveSpeedPercent`
+- `StorageMultiplier`
+- `BuildCostPercent`
+- `ScienceCostPercent`
+- `FactoryWorkerMultiplier`
+- `PowerInputPercent`
 
-## 🔧 Build
+`FactoryWorkerMultiplier` is still the JSON key for compatibility, but the current UI labels it as `Workplace workers` because the generator now applies the multiplier to general `WorkplaceSpec` entries.
+
+## 🧭 Runtime Flow
+
+1. The mod starts and resolves its working directory.
+2. `settings.json` is created if it does not exist.
+3. The starter regenerates blueprint overrides from the current settings.
+4. During gameplay, open the bottom-bar launcher to inspect the active values.
+5. Edit `settings.json`, click `Reload settings.json`, and restart Timberborn to fully apply the regenerated gameplay data.
+
+## 🛠️ Build
 
 Requirements:
 
 - Windows
-- Timberborn 1.0.x installed locally
-- .NET Framework C# compiler available at `C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe`
+- Timberborn `1.0.x` installed locally
+- `.NET Framework` C# compiler at `C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe`
 
 Build the DLL:
 
@@ -45,23 +69,52 @@ Build the DLL:
 powershell -ExecutionPolicy Bypass -File .\build.ps1
 ```
 
-If Timberborn is installed in a non-standard location, pass the path explicitly:
+If Timberborn is installed in a non-standard location, pass the game root explicitly:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\build.ps1 -GameRoot "C:\Path\To\Timberborn"
 ```
 
-## 🚀 Use
+## 🎮 Install And Use
 
 1. Build `Code.dll`.
-2. Copy this folder into `Documents\Timberborn\Mods\TimberBoostControl`, or create a junction to it.
-   Current local setup uses a junction from `C:\Users\Aslan\OneDrive\ドキュメント\Timberborn\Mods\TimberBoostControl` to `D:\Prj\TimberBoostControl`.
-3. Restart Timberborn and enable the mod in Mod Manager.
-4. Enter a save, click the `Boost` button on the bottom bar, choose your options, and click `Save`.
-5. Restart the game again to apply the generated blueprint changes.
+2. Copy this repository into `Documents\Timberborn\Mods\TimberBoostControl`, or create a junction that points there.
+3. Enable the mod in Timberborn's Mod Manager.
+4. Open the `Boost` launcher from the bottom bar.
+5. Edit `settings.json` directly when you want to change the multipliers.
+6. Click `Reload settings.json` in the panel.
+7. Restart the game to apply the regenerated blueprint data.
 
-## 🧪 Notes
+## 📚 Documentation
 
-- This repository is meant as a learning example for `IModStarter`, `Configurator`, `ILoadableSingleton`, and `UILayout`.
-- The mod generates JSON overrides from the base game blueprints instead of patching values live in memory.
-- Generated gameplay files can be safely regenerated by changing options and clicking `Save` again.
+- [Getting Started](https://sunwood-ai-labs.github.io/TimberBoostControl/getting-started)
+- [Settings](https://sunwood-ai-labs.github.io/TimberBoostControl/settings)
+- [Architecture](https://sunwood-ai-labs.github.io/TimberBoostControl/architecture)
+- [Troubleshooting](https://sunwood-ai-labs.github.io/TimberBoostControl/troubleshooting)
+
+## 📁 Repository Layout
+
+- `Source/`: C# sources for the DLL mod
+- `Assets/`: runtime UI assets such as the launcher icon
+- `docs/`: VitePress documentation site
+- `scripts/validate-repo.ps1`: structural QA script for repo polish
+- `build.ps1`: local build script for `Code.dll`
+- `manifest.json`: Timberborn mod manifest
+- `settings.json`: persisted settings file loaded by the mod
+
+Generated outputs such as `Buildings/`, `Characters/`, `Code.dll`, and `.generated-files.txt` are intentionally not tracked in git.
+
+## 🧪 Repository QA
+
+After installing the Node dependencies once, you can verify the public-facing surfaces locally:
+
+```powershell
+npm install
+npm run validate
+```
+
+## 📝 Notes
+
+- This repository is meant as a learning example for `IModStarter`, `Configurator`, `ILoadableSingleton`, `UILayout`, and JSON-driven content generation.
+- The mod writes override files into its own folder instead of patching gameplay values directly in memory.
+- Legacy boolean settings keys are still accepted when older local files are present.

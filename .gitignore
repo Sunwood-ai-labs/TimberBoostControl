@@ -6,3 +6,11 @@ Buildings/
 Characters/
 .vs/
 *.user
+node_modules/
+docs/node_modules/
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+npm-debug.log*
+docs-site/
+docs/node_modules/
+docs/.vitepress/dist/
