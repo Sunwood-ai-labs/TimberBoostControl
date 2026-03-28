@@ -1,6 +1,7 @@
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
 
 namespace Mods.TimberBoostControl
 {
@@ -25,10 +26,12 @@ namespace Mods.TimberBoostControl
             }
             catch (JsonException)
             {
+                Debug.LogWarning("TimberBoostControl could not parse settings.json. Falling back to default settings.");
                 return new TimberBoostControlSettings();
             }
             catch (IOException)
             {
+                Debug.LogWarning("TimberBoostControl could not read settings.json. Falling back to default settings.");
                 return new TimberBoostControlSettings();
             }
         }

@@ -9,30 +9,24 @@ namespace Mods.TimberBoostControl
 {
     public sealed class TimberBoostControlPanel : ILoadableSingleton
     {
-        private const int ExpandedWidth = 360;
-        private static readonly int[] CarryMultipliers = { 1, 2, 5, 10 };
-        private static readonly int[] MoveSpeedPresets = { 50, 100, 150, 200, 300 };
-        private static readonly int[] StorageMultipliers = { 1, 2, 5, 10 };
-        private static readonly int[] BuildCostPresets = { 100, 50, 25, 10 };
-        private static readonly int[] ScienceCostPresets = { 0, 25, 50, 100 };
-        private static readonly int[] FactoryWorkerPresets = { 1, 2, 4 };
-        private static readonly int[] PowerInputPresets = { 10, 50, 100 };
+        private const int ExpandedWidth = 400;
 
         private readonly TimberBoostControlGenerator _generator;
         private readonly QuickNotificationService _quickNotificationService;
         private readonly TimberBoostControlSettingsStore _settingsStore;
         private readonly UILayout _uiLayout;
 
-        private Button[] _buildCostPercentButtons;
-        private Button[] _carryMultiplierButtons;
+        private Label _buildCostPercentValueLabel;
+        private Label _carryMultiplierValueLabel;
         private TimberBoostControlSettings _currentSettings;
-        private Button[] _factoryWorkerMultiplierButtons;
-        private Button[] _moveSpeedPercentButtons;
-        private Button[] _powerInputPercentButtons;
-        private Button[] _scienceCostPercentButtons;
+        private Label _factoryWorkerMultiplierValueLabel;
+        private Label _moveSpeedPercentValueLabel;
+        private Label _powerInputPercentValueLabel;
         private VisualElement _root;
+        private Label _scienceCostPercentValueLabel;
+        private Label _settingsPathLabel;
         private Label _statusLabel;
-        private Button[] _storageMultiplierButtons;
+        private Label _storageMultiplierValueLabel;
         private bool _visible;
 
         public TimberBoostControlPanel(
@@ -49,14 +43,14 @@ namespace Mods.TimberBoostControl
 
         public void Load()
         {
-            var settings = _settingsStore.Load();
-            settings.Normalize();
-            _currentSettings = CloneSettings(settings);
-            var snappedOnLoad = SnapSettingsToPresets(_currentSettings);
+            _currentSettings = _settingsStore.Load();
+            _currentSettings.Normalize();
+
             var root = BuildRoot();
             _uiLayout.AddBottomRight(root, 150);
             SetVisible(false);
-            UpdateStatus(CreateLoadedStatusMessage("Loaded settings.", _currentSettings, snappedOnLoad));
+            RefreshDisplayedValues();
+            UpdateStatus(CreateLoadedStatusMessage("Loaded values from settings.json."));
         }
 
         public void ToggleVisibility()
@@ -101,62 +95,33 @@ namespace Mods.TimberBoostControl
             header.Add(closeButton);
             _root.Add(header);
 
-            var description = new Label("Open this panel from the bottom bar Boost button. Pick a preset for each value, then Save and restart the game.");
+            var description = new Label(
+                "This panel is read-only. Edit settings.json directly, then click Reload settings.json to refresh the values. Restart the game after reloading to apply regenerated blueprint overrides.");
             description.style.whiteSpace = WhiteSpace.Normal;
             description.style.color = new Color(0.83f, 0.9f, 0.86f);
             description.style.fontSize = 11;
-            description.style.marginBottom = 8;
+            description.style.marginBottom = 10;
             _root.Add(description);
 
-            _root.Add(CreatePresetRow(
-                "Carry multiplier",
-                CarryMultipliers,
-                FormatCarryMultiplier,
-                SelectCarryMultiplier));
-            _root.Add(CreatePresetRow(
-                "Move speed",
-                MoveSpeedPresets,
-                FormatPercent,
-                SelectMoveSpeedPercent));
-            _root.Add(CreatePresetRow(
-                "Storage multiplier",
-                StorageMultipliers,
-                FormatStorageMultiplier,
-                SelectStorageMultiplier));
-            _root.Add(CreatePresetRow(
-                "Building cost",
-                BuildCostPresets,
-                FormatPercent,
-                SelectBuildCostPercent));
-            _root.Add(CreatePresetRow(
-                "Science cost",
-                ScienceCostPresets,
-                FormatPercent,
-                SelectScienceCostPercent));
-            _root.Add(CreatePresetRow(
-                "Factory workers",
-                FactoryWorkerPresets,
-                FormatFactoryWorkerMultiplier,
-                SelectFactoryWorkerMultiplier));
-            _root.Add(CreatePresetRow(
-                "Power input",
-                PowerInputPresets,
-                FormatPercent,
-                SelectPowerInputPercent));
+            _root.Add(CreateValueRow("Carry multiplier", out _carryMultiplierValueLabel));
+            _root.Add(CreateValueRow("Move speed", out _moveSpeedPercentValueLabel));
+            _root.Add(CreateValueRow("Storage multiplier", out _storageMultiplierValueLabel));
+            _root.Add(CreateValueRow("Building cost", out _buildCostPercentValueLabel));
+            _root.Add(CreateValueRow("Science cost", out _scienceCostPercentValueLabel));
+            _root.Add(CreateValueRow("Workplace workers", out _factoryWorkerMultiplierValueLabel));
+            _root.Add(CreateValueRow("Power input", out _powerInputPercentValueLabel));
+            _root.Add(CreatePathCard("settings.json path", ModContext.SettingsPath, out _settingsPathLabel));
 
             var buttons = new VisualElement();
             buttons.style.flexDirection = FlexDirection.Row;
             buttons.style.marginTop = 10;
             buttons.style.marginBottom = 8;
 
-            var saveButton = CreateActionButton("Save", SaveClicked, new Color(0.24f, 0.48f, 0.3f, 1f));
-            var reloadButton = CreateActionButton("Reload", ReloadClicked, new Color(0.24f, 0.33f, 0.42f, 1f));
-            var resetButton = CreateActionButton("Reset", ResetClicked, new Color(0.45f, 0.23f, 0.24f, 1f));
-            resetButton.style.marginRight = 0;
-
-            buttons.Add(saveButton);
+            var reloadButton = CreateActionButton(
+                "Reload settings.json",
+                ReloadClicked,
+                new Color(0.24f, 0.33f, 0.42f, 1f));
             buttons.Add(reloadButton);
-            buttons.Add(resetButton);
             _root.Add(buttons);
 
             _statusLabel = new Label();
@@ -174,163 +139,136 @@ namespace Mods.TimberBoostControl
             _statusLabel.style.borderBottomRightRadius = 6;
             _root.Add(_statusLabel);
 
-            RefreshOptionRows();
             return _root;
         }
 
-        private VisualElement CreatePresetRow(
-            string text,
-            int[] values,
-            Func<int, string> optionLabelFor,
-            Action<int> selectedAction)
+        private static VisualElement CreateValueRow(string labelText, out Label valueLabel)
         {
             var row = new VisualElement();
-            row.style.marginTop = 3;
-            row.style.marginBottom = 3;
+            row.style.flexDirection = FlexDirection.Row;
+            row.style.justifyContent = Justify.SpaceBetween;
+            row.style.alignItems = Align.Center;
+            row.style.marginBottom = 6;
+            row.style.paddingLeft = 10;
+            row.style.paddingRight = 10;
+            row.style.paddingTop = 7;
+            row.style.paddingBottom = 7;
+            row.style.backgroundColor = new Color(0.11f, 0.16f, 0.14f, 0.94f);
+            row.style.borderTopLeftRadius = 6;
+            row.style.borderTopRightRadius = 6;
+            row.style.borderBottomLeftRadius = 6;
+            row.style.borderBottomRightRadius = 6;
+            row.style.borderTopWidth = 1;
+            row.style.borderRightWidth = 1;
+            row.style.borderBottomWidth = 1;
+            row.style.borderLeftWidth = 1;
+            row.style.borderTopColor = new Color(0.28f, 0.36f, 0.32f, 1f);
+            row.style.borderRightColor = row.style.borderTopColor;
+            row.style.borderBottomColor = row.style.borderTopColor;
+            row.style.borderLeftColor = row.style.borderTopColor;
 
-            var title = new Label(text);
-            title.style.color = new Color(0.88f, 0.95f, 0.9f);
-            title.style.fontSize = 13;
-            title.style.marginBottom = 2;
-            row.Add(title);
+            var label = new Label(labelText);
+            label.style.color = new Color(0.88f, 0.95f, 0.9f);
+            label.style.fontSize = 13;
+            label.style.flexGrow = 1;
+            label.style.marginRight = 8;
+            row.Add(label);
 
-            var optionList = new VisualElement();
-            optionList.style.flexDirection = FlexDirection.Row;
-            optionList.style.flexWrap = Wrap.Wrap;
-            row.Add(optionList);
-
-            var optionButtons = new Button[values.Length];
-            for (var i = 0; i < values.Length; i++)
-            {
-                var presetValue = values[i];
-                var optionButton = new Button(() => selectedAction(presetValue))
-                {
-                    text = optionLabelFor(presetValue)
-                };
-                optionButton.style.flexGrow = 1;
-                optionButton.style.marginRight = 4;
-                optionButton.style.marginBottom = 4;
-                optionButton.style.height = 38;
-                optionButton.style.minWidth = 72;
-                optionButton.style.unityFontStyleAndWeight = FontStyle.Normal;
-                optionButton.style.borderTopLeftRadius = 6;
-                optionButton.style.borderTopRightRadius = 6;
-                optionButton.style.borderBottomLeftRadius = 6;
-                optionButton.style.borderBottomRightRadius = 6;
-                optionButton.style.borderTopWidth = 1;
-                optionButton.style.borderRightWidth = 1;
-                optionButton.style.borderBottomWidth = 1;
-                optionButton.style.borderLeftWidth = 1;
-                optionButton.style.fontSize = 12;
-                optionList.Add(optionButton);
-                optionButtons[i] = optionButton;
-            }
-
-            if (optionButtons.Length > 0)
-            {
-                optionButtons[optionButtons.Length - 1].style.marginRight = 0;
-            }
-
-            switch (text)
-            {
-                case "Carry multiplier":
-                    _carryMultiplierButtons = optionButtons;
-                    break;
-                case "Move speed":
-                    _moveSpeedPercentButtons = optionButtons;
-                    break;
-                case "Storage multiplier":
-                    _storageMultiplierButtons = optionButtons;
-                    break;
-                case "Building cost":
-                    _buildCostPercentButtons = optionButtons;
-                    break;
-                case "Science cost":
-                    _scienceCostPercentButtons = optionButtons;
-                    break;
-                case "Factory workers":
-                    _factoryWorkerMultiplierButtons = optionButtons;
-                    break;
-                case "Power input":
-                    _powerInputPercentButtons = optionButtons;
-                    break;
-            }
-
-            ApplyOptionSelectionState(_carryMultiplierButtons, CarryMultipliers, _currentSettings.CarryMultiplier);
-            ApplyOptionSelectionState(_moveSpeedPercentButtons, MoveSpeedPresets, _currentSettings.MoveSpeedPercent);
-            ApplyOptionSelectionState(_storageMultiplierButtons, StorageMultipliers, _currentSettings.StorageMultiplier);
-            ApplyOptionSelectionState(_buildCostPercentButtons, BuildCostPresets, _currentSettings.BuildCostPercent);
-            ApplyOptionSelectionState(_scienceCostPercentButtons, ScienceCostPresets, _currentSettings.ScienceCostPercent);
-            ApplyOptionSelectionState(_factoryWorkerMultiplierButtons, FactoryWorkerPresets, _currentSettings.FactoryWorkerMultiplier);
-            ApplyOptionSelectionState(_powerInputPercentButtons, PowerInputPresets, _currentSettings.PowerInputPercent);
-
-            RefreshPresetSelectionByText(text, GetCurrentValueForText(text));
+            valueLabel = new Label();
+            valueLabel.style.color = Color.white;
+            valueLabel.style.fontSize = 14;
+            valueLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+            valueLabel.style.unityTextAlign = TextAnchor.MiddleRight;
+            row.Add(valueLabel);
 
             return row;
         }
 
-        private void RefreshPresetSelectionByText(string text, int selectedValue)
+        private static VisualElement CreatePathCard(string titleText, string pathText, out Label pathLabel)
         {
-            switch (text)
+            var card = new VisualElement();
+            card.style.marginTop = 4;
+            card.style.marginBottom = 2;
+            card.style.paddingLeft = 10;
+            card.style.paddingRight = 10;
+            card.style.paddingTop = 8;
+            card.style.paddingBottom = 8;
+            card.style.backgroundColor = new Color(0.09f, 0.11f, 0.15f, 0.92f);
+            card.style.borderTopLeftRadius = 6;
+            card.style.borderTopRightRadius = 6;
+            card.style.borderBottomLeftRadius = 6;
+            card.style.borderBottomRightRadius = 6;
+            card.style.borderTopWidth = 1;
+            card.style.borderRightWidth = 1;
+            card.style.borderBottomWidth = 1;
+            card.style.borderLeftWidth = 1;
+            card.style.borderTopColor = new Color(0.29f, 0.37f, 0.47f, 1f);
+            card.style.borderRightColor = card.style.borderTopColor;
+            card.style.borderBottomColor = card.style.borderTopColor;
+            card.style.borderLeftColor = card.style.borderTopColor;
+
+            var title = new Label(titleText);
+            title.style.color = new Color(0.85f, 0.91f, 0.98f);
+            title.style.fontSize = 12;
+            title.style.unityFontStyleAndWeight = FontStyle.Bold;
+            title.style.marginBottom = 4;
+            card.Add(title);
+
+            pathLabel = new Label(pathText);
+            pathLabel.style.whiteSpace = WhiteSpace.Normal;
+            pathLabel.style.color = Color.white;
+            pathLabel.style.fontSize = 12;
+            card.Add(pathLabel);
+
+            return card;
+        }
+
+        private void ReloadClicked()
+        {
+            _currentSettings = _settingsStore.Load();
+            _currentSettings.Normalize();
+            RefreshDisplayedValues();
+
+            var result = _generator.Generate(CloneSettings(_currentSettings));
+            if (result.Success)
             {
-                case "Carry multiplier":
-                    ApplyOptionSelectionState(_carryMultiplierButtons, CarryMultipliers, selectedValue);
-                    break;
-                case "Move speed":
-                    ApplyOptionSelectionState(_moveSpeedPercentButtons, MoveSpeedPresets, selectedValue);
-                    break;
-                case "Storage multiplier":
-                    ApplyOptionSelectionState(_storageMultiplierButtons, StorageMultipliers, selectedValue);
-                    break;
-                case "Building cost":
-                    ApplyOptionSelectionState(_buildCostPercentButtons, BuildCostPresets, selectedValue);
-                    break;
-                case "Science cost":
-                    ApplyOptionSelectionState(_scienceCostPercentButtons, ScienceCostPresets, selectedValue);
-                    break;
-                case "Factory workers":
-                    ApplyOptionSelectionState(_factoryWorkerMultiplierButtons, FactoryWorkerPresets, selectedValue);
-                    break;
-                case "Power input":
-                    ApplyOptionSelectionState(_powerInputPercentButtons, PowerInputPresets, selectedValue);
-                    break;
+                UpdateStatus(string.Format(
+                    "Reloaded settings.json and regenerated {0} blueprint file(s). Restart the game to apply.",
+                    result.FileCount));
+                _quickNotificationService.SendNotification(
+                    "TimberBoostControl reloaded settings.json. Restart the game to apply changes.");
+                return;
             }
+
+            UpdateStatus(result.Message);
+            _quickNotificationService.SendNotification(
+                "TimberBoostControl could not regenerate blueprint files from settings.json.");
         }
 
-        private int GetCurrentValueForText(string text)
+        private void SetVisible(bool visible)
         {
-            switch (text)
-            {
-                case "Carry multiplier":
-                    return _currentSettings.CarryMultiplier;
-                case "Move speed":
-                    return _currentSettings.MoveSpeedPercent;
-                case "Storage multiplier":
-                    return _currentSettings.StorageMultiplier;
-                case "Building cost":
-                    return _currentSettings.BuildCostPercent;
-                case "Science cost":
-                    return _currentSettings.ScienceCostPercent;
-                case "Factory workers":
-                    return _currentSettings.FactoryWorkerMultiplier;
-                case "Power input":
-                    return _currentSettings.PowerInputPercent;
-                default:
-                    return 0;
-            }
+            _visible = visible;
+            _root.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
-        private static string FormatCarryMultiplier(int value)
+        private void RefreshDisplayedValues()
         {
-            return value == 1 ? "1x (vanilla)" : string.Format("{0}x", value);
+            _carryMultiplierValueLabel.text = FormatMultiplier(_currentSettings.CarryMultiplier);
+            _moveSpeedPercentValueLabel.text = FormatPercent(_currentSettings.MoveSpeedPercent);
+            _storageMultiplierValueLabel.text = FormatMultiplier(_currentSettings.StorageMultiplier);
+            _buildCostPercentValueLabel.text = FormatPercent(_currentSettings.BuildCostPercent);
+            _scienceCostPercentValueLabel.text = FormatPercent(_currentSettings.ScienceCostPercent);
+            _factoryWorkerMultiplierValueLabel.text = FormatMultiplier(_currentSettings.FactoryWorkerMultiplier);
+            _powerInputPercentValueLabel.text = FormatPercent(_currentSettings.PowerInputPercent);
+            _settingsPathLabel.text = ModContext.SettingsPath;
         }
 
-        private static string FormatStorageMultiplier(int value)
+        private void UpdateStatus(string message)
         {
-            return value == 1 ? "1x (vanilla)" : string.Format("{0}x", value);
+            _statusLabel.text = message;
         }
 
-        private static string FormatFactoryWorkerMultiplier(int value)
+        private static string FormatMultiplier(int value)
         {
             return value == 1 ? "1x (vanilla)" : string.Format("{0}x", value);
         }
@@ -340,15 +278,14 @@ namespace Mods.TimberBoostControl
             return value == 100 ? "100% (vanilla)" : string.Format("{0}%", value);
         }
 
-        private static Button CreateActionButton(string text, System.Action clicked, Color backgroundColor)
+        private static Button CreateActionButton(string text, Action clicked, Color backgroundColor)
         {
             var button = new Button(clicked)
             {
                 text = text
             };
             button.style.flexGrow = 1;
-            button.style.height = 28;
-            button.style.marginRight = 6;
+            button.style.height = 30;
             button.style.color = Color.white;
             button.style.backgroundColor = backgroundColor;
             button.style.unityFontStyleAndWeight = FontStyle.Bold;
@@ -359,7 +296,7 @@ namespace Mods.TimberBoostControl
             return button;
         }
 
-        private static Button CreateHeaderButton(string text, System.Action clicked)
+        private static Button CreateHeaderButton(string text, Action clicked)
         {
             var button = new Button(clicked)
             {
@@ -375,129 +312,6 @@ namespace Mods.TimberBoostControl
             button.style.borderBottomLeftRadius = 6;
             button.style.borderBottomRightRadius = 6;
             return button;
-        }
-
-        private void SaveClicked()
-        {
-            var settings = CollectSettings();
-            _settingsStore.Save(settings);
-            var result = _generator.Generate(settings);
-
-            if (result.Success)
-            {
-                UpdateStatus(string.Format("Saved settings. Generated {0} file(s). Restart the game to apply.", result.FileCount));
-                _quickNotificationService.SendNotification("TimberBoostControl saved. Restart the game to apply changes.");
-            }
-            else
-            {
-                UpdateStatus(result.Message);
-                _quickNotificationService.SendNotification("TimberBoostControl could not generate its blueprint files.");
-            }
-        }
-
-        private void ReloadClicked()
-        {
-            var settings = _settingsStore.Load();
-            settings.Normalize();
-            var snappedOnReload = ApplySettings(settings);
-            UpdateStatus(CreateLoadedStatusMessage("Reloaded settings from disk.", _currentSettings, snappedOnReload));
-            _quickNotificationService.SendNotification("TimberBoostControl reloaded its saved settings.");
-        }
-
-        private void ResetClicked()
-        {
-            ApplySettings(new TimberBoostControlSettings());
-            UpdateStatus("Reset to defaults. Click Save to rewrite generated files.");
-            _quickNotificationService.SendNotification("TimberBoostControl reset its UI values.");
-        }
-
-        private TimberBoostControlSettings CollectSettings()
-        {
-            return CloneSettings(_currentSettings);
-        }
-
-        private bool ApplySettings(TimberBoostControlSettings settings)
-        {
-            _currentSettings = CloneSettings(settings);
-            var snapped = SnapSettingsToPresets(_currentSettings);
-            RefreshOptionRows();
-            return snapped;
-        }
-
-        private void SetVisible(bool visible)
-        {
-            _visible = visible;
-            _root.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
-        }
-
-        private void UpdateStatus(string message)
-        {
-            _statusLabel.text = message;
-        }
-
-        private void RefreshSelectionStatus()
-        {
-            UpdateStatus(string.Format("Selected: {0} preset(s). Click Save to write blueprint files.", CollectSettings().EnabledCount));
-        }
-
-        private void SelectCarryMultiplier(int value)
-        {
-            _currentSettings.CarryMultiplier = value;
-            RefreshOptionRows();
-            RefreshSelectionStatus();
-        }
-
-        private void SelectMoveSpeedPercent(int value)
-        {
-            _currentSettings.MoveSpeedPercent = value;
-            RefreshOptionRows();
-            RefreshSelectionStatus();
-        }
-
-        private void SelectStorageMultiplier(int value)
-        {
-            _currentSettings.StorageMultiplier = value;
-            RefreshOptionRows();
-            RefreshSelectionStatus();
-        }
-
-        private void SelectBuildCostPercent(int value)
-        {
-            _currentSettings.BuildCostPercent = value;
-            RefreshOptionRows();
-            RefreshSelectionStatus();
-        }
-
-        private void SelectScienceCostPercent(int value)
-        {
-            _currentSettings.ScienceCostPercent = value;
-            RefreshOptionRows();
-            RefreshSelectionStatus();
-        }
-
-        private void SelectFactoryWorkerMultiplier(int value)
-        {
-            _currentSettings.FactoryWorkerMultiplier = value;
-            RefreshOptionRows();
-            RefreshSelectionStatus();
-        }
-
-        private void SelectPowerInputPercent(int value)
-        {
-            _currentSettings.PowerInputPercent = value;
-            RefreshOptionRows();
-            RefreshSelectionStatus();
-        }
-
-        private void RefreshOptionRows()
-        {
-            RefreshPresetSelectionByText("Carry multiplier", _currentSettings.CarryMultiplier);
-            RefreshPresetSelectionByText("Move speed", _currentSettings.MoveSpeedPercent);
-            RefreshPresetSelectionByText("Storage multiplier", _currentSettings.StorageMultiplier);
-            RefreshPresetSelectionByText("Building cost", _currentSettings.BuildCostPercent);
-            RefreshPresetSelectionByText("Science cost", _currentSettings.ScienceCostPercent);
-            RefreshPresetSelectionByText("Factory workers", _currentSettings.FactoryWorkerMultiplier);
-            RefreshPresetSelectionByText("Power input", _currentSettings.PowerInputPercent);
         }
 
         private static TimberBoostControlSettings CloneSettings(TimberBoostControlSettings settings)
@@ -519,100 +333,11 @@ namespace Mods.TimberBoostControl
             };
         }
 
-        private static string CreateLoadedStatusMessage(string prefix, TimberBoostControlSettings settings, bool snapped)
+        private static string CreateLoadedStatusMessage(string prefix)
         {
-            if (snapped)
-            {
-                return string.Format("{0} Some values were snapped to the nearest preset. Selected: {1} preset(s).", prefix, settings.EnabledCount);
-            }
-
-            return string.Format("{0} Selected: {1} preset(s).", prefix, settings.EnabledCount);
-        }
-
-        private static bool SnapSettingsToPresets(TimberBoostControlSettings settings)
-        {
-            if (settings == null)
-            {
-                return false;
-            }
-
-            var snapped = false;
-            snapped |= UpdateSettingToNearestPreset(settings, CarryMultipliers, settings.CarryMultiplier, value => settings.CarryMultiplier = value);
-            snapped |= UpdateSettingToNearestPreset(settings, MoveSpeedPresets, settings.MoveSpeedPercent, value => settings.MoveSpeedPercent = value);
-            snapped |= UpdateSettingToNearestPreset(settings, StorageMultipliers, settings.StorageMultiplier, value => settings.StorageMultiplier = value);
-            snapped |= UpdateSettingToNearestPreset(settings, BuildCostPresets, settings.BuildCostPercent, value => settings.BuildCostPercent = value);
-            snapped |= UpdateSettingToNearestPreset(settings, ScienceCostPresets, settings.ScienceCostPercent, value => settings.ScienceCostPercent = value);
-            snapped |= UpdateSettingToNearestPreset(settings, FactoryWorkerPresets, settings.FactoryWorkerMultiplier, value => settings.FactoryWorkerMultiplier = value);
-            snapped |= UpdateSettingToNearestPreset(settings, PowerInputPresets, settings.PowerInputPercent, value => settings.PowerInputPercent = value);
-            return snapped;
-        }
-
-        private static bool UpdateSettingToNearestPreset(
-            TimberBoostControlSettings settings,
-            int[] presets,
-            int currentValue,
-            Action<int> applyValue)
-        {
-            var snappedValue = SnapToNearestPreset(currentValue, presets);
-            if (snappedValue == currentValue)
-            {
-                return false;
-            }
-
-            applyValue(snappedValue);
-            return true;
-        }
-
-        private static int SnapToNearestPreset(int value, int[] presets)
-        {
-            if (presets == null || presets.Length == 0)
-            {
-                return value;
-            }
-
-            var closest = presets[0];
-            var closestDistance = Math.Abs(value - closest);
-
-            for (var i = 1; i < presets.Length; i++)
-            {
-                var candidate = presets[i];
-                var distance = Math.Abs(value - candidate);
-                if (distance < closestDistance)
-                {
-                    closest = candidate;
-                    closestDistance = distance;
-                }
-            }
-
-            return closest;
-        }
-
-        private static void ApplyOptionSelectionState(Button[] optionButtons, int[] optionValues, int selectedValue)
-        {
-            if (optionButtons == null || optionButtons.Length == 0)
-            {
-                return;
-            }
-
-            for (var i = 0; i < optionButtons.Length; i++)
-            {
-                var isSelected = optionValues[i] == selectedValue;
-                optionButtons[i].style.backgroundColor = isSelected
-                    ? new Color(0.16f, 0.28f, 0.19f, 0.98f)
-                    : new Color(0.11f, 0.16f, 0.14f, 0.94f);
-                optionButtons[i].style.borderTopColor = isSelected
-                    ? new Color(0.6f, 0.82f, 0.65f, 1f)
-                    : new Color(0.28f, 0.36f, 0.32f, 1f);
-                optionButtons[i].style.borderRightColor = optionButtons[i].style.borderTopColor;
-                optionButtons[i].style.borderBottomColor = optionButtons[i].style.borderTopColor;
-                optionButtons[i].style.borderLeftColor = optionButtons[i].style.borderTopColor;
-                optionButtons[i].style.borderTopWidth = isSelected ? 2 : 1;
-                optionButtons[i].style.borderRightWidth = isSelected ? 2 : 1;
-                optionButtons[i].style.borderBottomWidth = isSelected ? 2 : 1;
-                optionButtons[i].style.borderLeftWidth = isSelected ? 2 : 1;
-                optionButtons[i].style.unityFontStyleAndWeight = isSelected ? FontStyle.Bold : FontStyle.Normal;
-                optionButtons[i].style.color = Color.white;
-            }
+            return string.Format(
+                "{0} Edit settings.json directly, then use Reload settings.json to refresh the panel.",
+                prefix);
         }
     }
 }

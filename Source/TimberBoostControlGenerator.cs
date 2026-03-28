@@ -208,8 +208,7 @@ namespace Mods.TimberBoostControl
 
                     if (settings.FactoryWorkerMultiplier > 1 &&
                         source["WorkplaceSpec"] != null &&
-                        source["WorkplaceSpec"].Type == JTokenType.Object &&
-                        (source["ManufactorySpec"] != null || source["WorkshopSpec"] != null))
+                        source["WorkplaceSpec"].Type == JTokenType.Object)
                     {
                         var workplaceSpec = new JObject();
                         var workplaceSource = (JObject)source["WorkplaceSpec"];

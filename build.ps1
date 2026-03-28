@@ -55,6 +55,8 @@ $references = @(
     (Join-Path $managedDir "Timberborn.SingletonSystem.dll"),
     (Join-Path $managedDir "Timberborn.UILayoutSystem.dll"),
     (Join-Path $managedDir "UnityEngine.CoreModule.dll"),
+    (Join-Path $managedDir "UnityEngine.ImageConversionModule.dll"),
+    (Join-Path $managedDir "UnityEngine.IMGUIModule.dll"),
     (Join-Path $managedDir "UnityEngine.TextRenderingModule.dll"),
     (Join-Path $managedDir "UnityEngine.UIElementsModule.dll"),
     (Join-Path $frameworkDir "System.IO.Compression.dll"),
