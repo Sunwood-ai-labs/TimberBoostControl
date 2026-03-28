@@ -38,6 +38,16 @@ powershell -ExecutionPolicy Bypass -File .\build.ps1 -GameRoot "C:\Path\To\Timbe
 5. Click `Reload settings.json` in the panel.
 6. Restart Timberborn so the regenerated gameplay data is fully applied.
 
+## Screenshots
+
+### Bottom-bar launcher
+
+![Bottom-bar launcher](/screenshots/timberboostcontrol-bottom-bar-launcher.png)
+
+### Control panel
+
+![Control panel](/screenshots/timberboostcontrol-control-panel.png)
+
 ## Generated files
 
 The generator cleans up files listed in `.generated-files.txt`, writes the current set of overrides, and then refreshes the tracking file. Typical outputs are:

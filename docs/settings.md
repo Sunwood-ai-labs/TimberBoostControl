@@ -4,7 +4,9 @@
 
 `settings.json` stores numeric values. The code keeps the legacy boolean keys readable for compatibility, but new saves should use the numeric schema below.
 
-| Key | Default | Effect | Notes |
+The built-in code defaults are conservative. The committed `settings.json` in this repository currently uses a stronger showcase preset with `CarryMultiplier=100`, `MoveSpeedPercent=500`, and `StorageMultiplier=100`.
+
+| Key | Code default | Effect | Notes |
 | --- | --- | --- | --- |
 | `CarryMultiplier` | `10` | Multiplies `GoodCarrierSpec.BaseLiftingCapacity`. | Use `1` for vanilla behavior. |
 | `MoveSpeedPercent` | `200` | Scales walking and slowed walking speeds. | `100` keeps vanilla values. |
@@ -13,6 +15,10 @@
 | `ScienceCostPercent` | `0` | Scales `BuildingSpec.ScienceCost`. | `0` makes science free. |
 | `FactoryWorkerMultiplier` | `2` | Expands `WorkplaceSpec` worker counts. | The UI label says `Workplace workers` because the generator now applies to general workplaces, not only factories. |
 | `PowerInputPercent` | `10` | Scales `MechanicalNodeSpec.PowerInput`. | Values above `0` are clamped to stay positive. |
+
+## Example file
+
+![settings.json screenshot](/screenshots/timberboostcontrol-settings-json.png)
 
 ## Normalization rules
 

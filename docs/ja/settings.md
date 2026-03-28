@@ -4,7 +4,9 @@
 
 `settings.json` は数値ベースの設定を保持します。互換性のため旧来の boolean キーも読み込めますが、新しい保存形式としては以下の数値キーを使う想定です。
 
-| キー | 既定値 | 効果 | 補足 |
+コード側の組み込み既定値は控えめですが、このリポジトリにコミットしている `settings.json` は `CarryMultiplier=100`、`MoveSpeedPercent=500`、`StorageMultiplier=100` の強めなサンプル値を使っています。
+
+| キー | コード既定値 | 効果 | 補足 |
 | --- | --- | --- | --- |
 | `CarryMultiplier` | `10` | `GoodCarrierSpec.BaseLiftingCapacity` を倍率変更します。 | `1` でバニラ相当です。 |
 | `MoveSpeedPercent` | `200` | 歩行速度と減速時速度を割合変更します。 | `100` でバニラ相当です。 |
@@ -13,6 +15,10 @@
 | `ScienceCostPercent` | `0` | `BuildingSpec.ScienceCost` を割合変更します。 | `0` で研究コストが無料になります。 |
 | `FactoryWorkerMultiplier` | `2` | `WorkplaceSpec` の労働者数を拡張します。 | UI 表記は `Workplace workers` ですが、互換性のため JSON キー名はそのままです。 |
 | `PowerInputPercent` | `10` | `MechanicalNodeSpec.PowerInput` を割合変更します。 | 正の値を保つように補正されます。 |
+
+## 設定ファイルの例
+
+![settings.json screenshot](/screenshots/timberboostcontrol-settings-json.png)
 
 ## 正規化ルール
 

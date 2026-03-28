@@ -38,6 +38,16 @@ powershell -ExecutionPolicy Bypass -File .\build.ps1 -GameRoot "C:\Path\To\Timbe
 5. パネルの `Reload settings.json` を押して再生成します。
 6. 再生成した内容を完全に反映するため、Timberborn を再起動します。
 
+## スクリーンショット
+
+### bottom bar ランチャー
+
+![bottom bar launcher](/screenshots/timberboostcontrol-bottom-bar-launcher.png)
+
+### コントロールパネル
+
+![control panel](/screenshots/timberboostcontrol-control-panel.png)
+
 ## 生成ファイル
 
 ジェネレーターは `.generated-files.txt` に記録された旧ファイルを掃除し、最新の override を出力してから追跡ファイルを書き直します。主な出力先は次のとおりです。

@@ -55,6 +55,20 @@ TimberBoostControl は、C# DLL MOD と生成済み `.blueprint.json` override �
 4. ゲーム中は bottom bar のランチャーから現在値を確認できます。
 5. `settings.json` を編集し、`Reload settings.json` を押してから Timberborn を再起動すると、再生成した内容を完全に反映できます。
 
+## 🖼️ スクリーンショット
+
+### bottom bar ランチャー
+
+![bottom bar launcher](./Assets/Screenshots/timberboostcontrol-bottom-bar-launcher.png)
+
+### コントロールパネル
+
+![control panel](./Assets/Screenshots/timberboostcontrol-control-panel.png)
+
+### コミット済み settings.json サンプル
+
+![settings.json sample](./Assets/Screenshots/timberboostcontrol-settings-json.png)
+
 ## 🛠️ ビルド
 
 必要なもの:
@@ -95,7 +109,7 @@ powershell -ExecutionPolicy Bypass -File .\build.ps1 -GameRoot "C:\Path\To\Timbe
 ## 📁 リポジトリ構成
 
 - `Source/`: DLL MOD の C# ソース
-- `Assets/`: ランチャーアイコンなどの runtime UI 資産
+- `Assets/`: ランチャーアイコンとリポジトリ用スクリーンショット
 - `docs/`: VitePress ベースのドキュメントサイト
 - `scripts/validate-repo.ps1`: リポジトリ整備用の構造 QA スクリプト
 - `build.ps1`: `Code.dll` をビルドするローカルスクリプト
@@ -118,3 +132,4 @@ npm run validate
 - このリポジトリは `IModStarter`、`Configurator`、`ILoadableSingleton`、`UILayout`、そして JSON 駆動のコンテンツ生成を学ぶ題材として作られています。
 - gameplay 値をメモリ上で直接書き換えるのではなく、MOD フォルダに override ファイルを書き出す方式です。
 - 古いローカル設定ファイルが残っていても、legacy boolean キーを読み替えられます。
+- このリポジトリにコミットしている `settings.json` は、組み込み既定値より強めのサンプル設定です。

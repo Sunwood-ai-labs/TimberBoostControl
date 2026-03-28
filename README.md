@@ -55,6 +55,20 @@ Supported value groups:
 4. During gameplay, open the bottom-bar launcher to inspect the active values.
 5. Edit `settings.json`, click `Reload settings.json`, and restart Timberborn to fully apply the regenerated gameplay data.
 
+## 🖼️ Screenshots
+
+### Bottom-bar launcher
+
+![Bottom-bar launcher](./Assets/Screenshots/timberboostcontrol-bottom-bar-launcher.png)
+
+### Control panel
+
+![Control panel](./Assets/Screenshots/timberboostcontrol-control-panel.png)
+
+### Committed settings.json sample
+
+![settings.json sample](./Assets/Screenshots/timberboostcontrol-settings-json.png)
+
 ## 🛠️ Build
 
 Requirements:
@@ -95,7 +109,7 @@ powershell -ExecutionPolicy Bypass -File .\build.ps1 -GameRoot "C:\Path\To\Timbe
 ## 📁 Repository Layout
 
 - `Source/`: C# sources for the DLL mod
-- `Assets/`: runtime UI assets such as the launcher icon
+- `Assets/`: runtime UI assets and repository screenshots
 - `docs/`: VitePress documentation site
 - `scripts/validate-repo.ps1`: structural QA script for repo polish
 - `build.ps1`: local build script for `Code.dll`
@@ -118,3 +132,4 @@ npm run validate
 - This repository is meant as a learning example for `IModStarter`, `Configurator`, `ILoadableSingleton`, `UILayout`, and JSON-driven content generation.
 - The mod writes override files into its own folder instead of patching gameplay values directly in memory.
 - Legacy boolean settings keys are still accepted when older local files are present.
+- The committed `settings.json` is currently a showcase sample with stronger values than the built-in code defaults.

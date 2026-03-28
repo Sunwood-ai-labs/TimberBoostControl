@@ -82,7 +82,13 @@ function assertDocsSurface() {
     'docs/.vitepress/theme/index.ts',
     'docs/.vitepress/theme/styles.css',
     'docs/public/boost-icon.png',
-    'docs/public/brand/boost-emblem.svg'
+    'docs/public/brand/boost-emblem.svg',
+    'docs/public/screenshots/timberboostcontrol-bottom-bar-launcher.png',
+    'docs/public/screenshots/timberboostcontrol-control-panel.png',
+    'docs/public/screenshots/timberboostcontrol-settings-json.png',
+    'Assets/Screenshots/timberboostcontrol-bottom-bar-launcher.png',
+    'Assets/Screenshots/timberboostcontrol-control-panel.png',
+    'Assets/Screenshots/timberboostcontrol-settings-json.png'
   ]
 
   for (const relativePath of requiredDocs) {
@@ -93,9 +99,15 @@ function assertDocsSurface() {
 function assertRepoPolishDetails() {
   assertFileContains('README.md', /README\.ja\.md/, 'Japanese language switch link')
   assertFileContains('README.md', /https:\/\/sunwood-ai-labs\.github\.io\/TimberBoostControl\//, 'published docs link')
+  assertFileContains('README.md', /Assets\/Screenshots\/timberboostcontrol-control-panel\.png/, 'README screenshot section')
   assertFileContains('README.ja.md', /README\.md/, 'English language switch link')
+  assertFileContains('README.ja.md', /Assets\/Screenshots\/timberboostcontrol-settings-json\.png/, 'Japanese README screenshot section')
   assertFileContains('docs/index.md', /\/getting-started/, 'English getting started action')
   assertFileContains('docs\/ja\/index.md', /\/ja\/getting-started/, 'Japanese getting started action')
+  assertFileContains('docs/getting-started.md', /\/screenshots\/timberboostcontrol-control-panel\.png/, 'English docs screenshots')
+  assertFileContains('docs/settings.md', /\/screenshots\/timberboostcontrol-settings-json\.png/, 'English settings screenshot')
+  assertFileContains('docs/ja/getting-started.md', /\/screenshots\/timberboostcontrol-control-panel\.png/, 'Japanese docs screenshots')
+  assertFileContains('docs/ja/settings.md', /\/screenshots\/timberboostcontrol-settings-json\.png/, 'Japanese settings screenshot')
   assertFileContains('docs/.vitepress/config.mts', /\/TimberBoostControl\//, 'GitHub Pages base path')
   assertFileContains('.github/workflows/deploy-docs.yml', /actions\/deploy-pages@v4/, 'GitHub Pages deploy action')
   assertFileContains('.github/workflows/deploy-docs.yml', /docs\/\.vitepress\/dist/, 'Pages artifact path')

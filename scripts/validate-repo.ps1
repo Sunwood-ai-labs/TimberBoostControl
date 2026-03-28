@@ -51,6 +51,12 @@ $requiredPaths = @(
     "docs/.vitepress/theme/index.ts",
     "docs/.vitepress/theme/styles.css",
     "docs/public/brand/boost-emblem.svg",
+    "docs/public/screenshots/timberboostcontrol-bottom-bar-launcher.png",
+    "docs/public/screenshots/timberboostcontrol-control-panel.png",
+    "docs/public/screenshots/timberboostcontrol-settings-json.png",
+    "Assets/Screenshots/timberboostcontrol-bottom-bar-launcher.png",
+    "Assets/Screenshots/timberboostcontrol-control-panel.png",
+    "Assets/Screenshots/timberboostcontrol-settings-json.png",
     ".github/workflows/ci.yml",
     ".github/workflows/deploy-docs.yml"
 )
@@ -77,9 +83,15 @@ foreach ($scriptName in $requiredScripts) {
 
 Assert-Contains "README.md" "README\.ja\.md" "Japanese language switch link"
 Assert-Contains "README.md" "https://sunwood-ai-labs\.github\.io/TimberBoostControl/" "published docs link"
+Assert-Contains "README.md" "Assets/Screenshots/timberboostcontrol-control-panel\.png" "README screenshot section"
 Assert-Contains "README.ja.md" "README\.md" "English language switch link"
+Assert-Contains "README.ja.md" "Assets/Screenshots/timberboostcontrol-settings-json\.png" "Japanese README screenshot section"
 Assert-Contains "docs/index.md" "/getting-started" "English getting started action"
 Assert-Contains "docs/ja/index.md" "/ja/getting-started" "Japanese getting started action"
+Assert-Contains "docs/getting-started.md" "/screenshots/timberboostcontrol-control-panel\.png" "English docs screenshots"
+Assert-Contains "docs/settings.md" "/screenshots/timberboostcontrol-settings-json\.png" "English settings screenshot"
+Assert-Contains "docs/ja/getting-started.md" "/screenshots/timberboostcontrol-control-panel\.png" "Japanese docs screenshots"
+Assert-Contains "docs/ja/settings.md" "/screenshots/timberboostcontrol-settings-json\.png" "Japanese settings screenshot"
 Assert-Contains "docs/.vitepress/config.mts" "/TimberBoostControl/" "GitHub Pages base path"
 Assert-Contains ".github/workflows/deploy-docs.yml" "actions/deploy-pages@v4" "GitHub Pages deploy action"
 Assert-Contains ".github/workflows/deploy-docs.yml" "docs/.vitepress/dist" "Pages artifact path"
