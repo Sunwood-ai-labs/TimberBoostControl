@@ -7,6 +7,7 @@ const navItemsEn = [
   { text: 'Settings', link: '/settings' },
   { text: 'Architecture', link: '/architecture' },
   { text: 'Troubleshooting', link: '/troubleshooting' },
+  { text: 'Releases', link: '/releases/' },
   { text: 'Japanese', link: '/ja/' },
   { text: 'GitHub', link: repoUrl }
 ]
@@ -16,6 +17,7 @@ const navItemsJa = [
   { text: '設定', link: '/ja/settings' },
   { text: '構成', link: '/ja/architecture' },
   { text: 'トラブル', link: '/ja/troubleshooting' },
+  { text: 'リリース', link: '/ja/releases/' },
   { text: 'English', link: '/' },
   { text: 'GitHub', link: repoUrl }
 ]
@@ -30,6 +32,14 @@ const sidebarBase = [
       { text: 'Architecture', link: '/architecture' },
       { text: 'Troubleshooting', link: '/troubleshooting' }
     ]
+  },
+  {
+    text: 'Releases',
+    items: [
+      { text: 'Overview', link: '/releases/' },
+      { text: 'v0.1.0 Release Notes', link: '/releases/v0.1.0' },
+      { text: 'v0.1.0 Walkthrough', link: '/guide/articles/timberboostcontrol-v0-1-0' }
+    ]
   }
 ]
 
@@ -42,6 +52,14 @@ const sidebarJa = [
       { text: '設定リファレンス', link: '/ja/settings' },
       { text: 'アーキテクチャ', link: '/ja/architecture' },
       { text: 'トラブルシューティング', link: '/ja/troubleshooting' }
+    ]
+  },
+  {
+    text: 'リリース',
+    items: [
+      { text: '一覧', link: '/ja/releases/' },
+      { text: 'v0.1.0 リリースノート', link: '/ja/releases/v0.1.0' },
+      { text: 'v0.1.0 導入記事', link: '/ja/guide/articles/timberboostcontrol-v0-1-0' }
     ]
   }
 ]

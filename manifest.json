@@ -1,6 +1,6 @@
 {
   "Name": "TimberBoostControl",
-  "Version": "0.1.1",
+  "Version": "0.1.0",
   "Id": "Aslan.TimberBoostControl",
   "MinimumGameVersion": "1.0.0.0",
   "Description": "Practice mod with an in-game settings UI that generates Timberborn blueprint tweaks.",

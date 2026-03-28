@@ -73,16 +73,23 @@ function assertDocsSurface() {
     'docs/settings.md',
     'docs/architecture.md',
     'docs/troubleshooting.md',
+    'docs/releases/index.md',
+    'docs/releases/v0.1.0.md',
+    'docs/guide/articles/timberboostcontrol-v0-1-0.md',
     'docs/ja/index.md',
     'docs/ja/getting-started.md',
     'docs/ja/settings.md',
     'docs/ja/architecture.md',
     'docs/ja/troubleshooting.md',
+    'docs/ja/releases/index.md',
+    'docs/ja/releases/v0.1.0.md',
+    'docs/ja/guide/articles/timberboostcontrol-v0-1-0.md',
     'docs/.vitepress/config.mts',
     'docs/.vitepress/theme/index.ts',
     'docs/.vitepress/theme/styles.css',
     'docs/public/boost-icon.png',
     'docs/public/brand/boost-emblem.svg',
+    'docs/public/releases/release-header-v0.1.0.svg',
     'docs/public/screenshots/timberboostcontrol-bottom-bar-launcher.png',
     'docs/public/screenshots/timberboostcontrol-control-panel.png',
     'docs/public/screenshots/timberboostcontrol-settings-json.png',
@@ -101,13 +108,27 @@ function assertRepoPolishDetails() {
   assertFileContains('README.md', /https:\/\/sunwood-ai-labs\.github\.io\/TimberBoostControl\//, 'published docs link')
   assertFileContains('README.md', /timberborn-modding-skill/, 'skill provenance note')
   assertFileContains('README.md', /Assets\/Screenshots\/timberboostcontrol-control-panel\.png/, 'README screenshot section')
+  assertFileContains('README.md', /releases\/v0\.1\.0/, 'English v0.1.0 release link')
+  assertFileContains('README.md', /guide\/articles\/timberboostcontrol-v0-1-0/, 'English v0.1.0 walkthrough link')
   assertFileContains('README.ja.md', /README\.md/, 'English language switch link')
   assertFileContains('README.ja.md', /timberborn-modding-skill/, 'Japanese skill provenance note')
   assertFileContains('README.ja.md', /Assets\/Screenshots\/timberboostcontrol-settings-json\.png/, 'Japanese README screenshot section')
+  assertFileContains('README.ja.md', /releases\/v0\.1\.0/, 'Japanese v0.1.0 release link')
+  assertFileContains('README.ja.md', /guide\/articles\/timberboostcontrol-v0-1-0/, 'Japanese v0.1.0 walkthrough link')
   assertFileContains('docs/index.md', /\/getting-started/, 'English getting started action')
   assertFileContains('docs/index.md', /timberborn-modding-skill/, 'English docs home provenance note')
+  assertFileContains('docs/index.md', /\/releases\/v0\.1\.0/, 'English v0.1.0 release notes link')
+  assertFileContains('docs/index.md', /\/guide\/articles\/timberboostcontrol-v0-1-0/, 'English v0.1.0 walkthrough article link')
+  assertFileContains('docs/releases/index.md', /\/releases\/v0\.1\.0/, 'English release index entry')
+  assertFileContains('docs/releases/v0.1.0.md', /Initial release note covers the full shipped history/i, 'English initial release scope note')
+  assertFileContains('docs/guide/articles/timberboostcontrol-v0-1-0.md', /Release notes for v0\.1\.0/, 'English walkthrough backlink')
   assertFileContains('docs\/ja\/index.md', /\/ja\/getting-started/, 'Japanese getting started action')
   assertFileContains('docs\/ja\/index.md', /timberborn-modding-skill/, 'Japanese docs home provenance note')
+  assertFileContains('docs/ja/index.md', /\/ja\/releases\/v0\.1\.0/, 'Japanese v0.1.0 release notes link')
+  assertFileContains('docs/ja/index.md', /\/ja\/guide\/articles\/timberboostcontrol-v0-1-0/, 'Japanese v0.1.0 walkthrough article link')
+  assertFileContains('docs/ja/releases/index.md', /\/ja\/releases\/v0\.1\.0/, 'Japanese release index entry')
+  assertFileContains('docs/ja/releases/v0.1.0.md', /初回公開タグに含まれる全履歴/, 'Japanese initial release scope note')
+  assertFileContains('docs/ja/guide/articles/timberboostcontrol-v0-1-0.md', /リリースノート/, 'Japanese walkthrough backlink')
   assertFileContains('docs/getting-started.md', /\/screenshots\/timberboostcontrol-control-panel\.png/, 'English docs screenshots')
   assertFileContains('docs/settings.md', /\/screenshots\/timberboostcontrol-settings-json\.png/, 'English settings screenshot')
   assertFileContains('docs/architecture.md', /timberborn-modding-skill/, 'English architecture provenance note')
@@ -115,6 +136,8 @@ function assertRepoPolishDetails() {
   assertFileContains('docs/ja/settings.md', /\/screenshots\/timberboostcontrol-settings-json\.png/, 'Japanese settings screenshot')
   assertFileContains('docs/ja/architecture.md', /timberborn-modding-skill/, 'Japanese architecture provenance note')
   assertFileContains('docs/.vitepress/config.mts', /\/TimberBoostControl\//, 'GitHub Pages base path')
+  assertFileContains('docs/.vitepress/config.mts', /\/releases\//, 'Release index route in docs config')
+  assertFileContains('docs/.vitepress/config.mts', /timberboostcontrol-v0-1-0/, 'Walkthrough route in docs config')
   assertFileContains('.github/workflows/deploy-docs.yml', /actions\/deploy-pages@v4/, 'GitHub Pages deploy action')
   assertFileContains('.github/workflows/deploy-docs.yml', /docs\/\.vitepress\/dist/, 'Pages artifact path')
   assertFileContains('.github/workflows/ci.yml', /npm run validate/, 'combined repository QA command')

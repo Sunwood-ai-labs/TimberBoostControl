@@ -105,6 +105,8 @@ powershell -ExecutionPolicy Bypass -File .\build.ps1 -GameRoot "C:\Path\To\Timbe
 - [設定](https://sunwood-ai-labs.github.io/TimberBoostControl/ja/settings)
 - [アーキテクチャ](https://sunwood-ai-labs.github.io/TimberBoostControl/ja/architecture)
 - [トラブルシューティング](https://sunwood-ai-labs.github.io/TimberBoostControl/ja/troubleshooting)
+- [v0.1.0 リリースノート](https://sunwood-ai-labs.github.io/TimberBoostControl/ja/releases/v0.1.0)
+- [v0.1.0 導入記事](https://sunwood-ai-labs.github.io/TimberBoostControl/ja/guide/articles/timberboostcontrol-v0-1-0)
 
 ## 📁 リポジトリ構成
 

@@ -55,6 +55,11 @@ This repository workflow and the initial modding scaffold were developed with su
   </div>
 </div>
 
+## Latest release
+
+- Read [Release Notes (v0.1.0)](/releases/v0.1.0) for the initial release scope and shipped behavior.
+- Follow the [Walkthrough (v0.1.0)](/guide/articles/timberboostcontrol-v0-1-0) when you want a release-focused setup and runtime checklist.
+
 ## Documentation map
 
 - Start with [Getting Started](/getting-started) for build, install, and runtime flow.

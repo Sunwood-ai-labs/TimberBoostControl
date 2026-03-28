@@ -55,6 +55,11 @@ TimberBoostControl は、学習用として追いやすい規模を保ちなが�
   </div>
 </div>
 
+## 最新リリース
+
+- [v0.1.0 リリースノート](/ja/releases/v0.1.0) で、初回公開の範囲と出荷挙動を確認できます。
+- [v0.1.0 導入記事](/ja/guide/articles/timberboostcontrol-v0-1-0) で、release 観点の導入と動作確認手順を追えます。
+
 ## ドキュメント案内
 
 - [導入ガイド](/ja/getting-started) でビルド・配置・運用フローを確認できます。
