@@ -38,6 +38,8 @@ TimberBoostControl is intentionally small enough to study, but complete enough t
 - a settings store with legacy compatibility
 - blueprint generation that writes JSON overrides into the mod folder
 
+This repository workflow and the initial modding scaffold were developed with support from [timberborn-modding-skill](https://github.com/Sunwood-ai-labs/timberborn-modding-skill).
+
 <div class="quick-facts">
   <div>
     <strong>Game target</strong>

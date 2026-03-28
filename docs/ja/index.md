@@ -38,6 +38,8 @@ TimberBoostControl は、学習用として追いやすい規模を保ちなが�
 - 互換性を考慮した `settings.json` ロード
 - mod フォルダ内へ書き出す blueprint override 生成
 
+このリポジトリのワークフローと初期の MOD 土台は [timberborn-modding-skill](https://github.com/Sunwood-ai-labs/timberborn-modding-skill) の支援を受けて整備しています。
+
 <div class="quick-facts">
   <div>
     <strong>対象ゲーム</strong>

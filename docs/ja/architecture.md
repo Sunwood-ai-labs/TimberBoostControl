@@ -26,6 +26,10 @@
 - `docs/`: VitePress ドキュメント
 - `scripts/validate-repo.ps1`: ローカルと CI で使う構造 QA スクリプト
 
+## 出自
+
+このリポジトリのワークフローと MOD の土台は [timberborn-modding-skill](https://github.com/Sunwood-ai-labs/timberborn-modding-skill) の支援を受けて整備しています。
+
 ## 推奨検証
 
 リポジトリを更新したら、次の順で確認するのがおすすめです。

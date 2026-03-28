@@ -133,3 +133,4 @@ npm run validate
 - The mod writes override files into its own folder instead of patching gameplay values directly in memory.
 - Legacy boolean settings keys are still accepted when older local files are present.
 - The committed `settings.json` is currently a showcase sample with stronger values than the built-in code defaults.
+- This repository workflow and mod scaffolding were developed with support from [timberborn-modding-skill](https://github.com/Sunwood-ai-labs/timberborn-modding-skill).

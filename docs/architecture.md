@@ -26,6 +26,10 @@ The codebase is split into a few focused pieces:
 - `docs/`: VitePress documentation site
 - `scripts/validate-repo.ps1`: structural QA used locally and in CI
 
+## Provenance
+
+This repository workflow and the modding scaffold were assembled with support from [timberborn-modding-skill](https://github.com/Sunwood-ai-labs/timberborn-modding-skill).
+
 ## Recommended verification
 
 When you change the repo:

@@ -133,3 +133,4 @@ npm run validate
 - gameplay 値をメモリ上で直接書き換えるのではなく、MOD フォルダに override ファイルを書き出す方式です。
 - 古いローカル設定ファイルが残っていても、legacy boolean キーを読み替えられます。
 - このリポジトリにコミットしている `settings.json` は、組み込み既定値より強めのサンプル設定です。
+- このリポジトリのワークフローと MOD の土台は [timberborn-modding-skill](https://github.com/Sunwood-ai-labs/timberborn-modding-skill) の支援を受けて整備しています。
