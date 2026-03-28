@@ -24,6 +24,13 @@ function assertDirectory(relativePath) {
   }
 }
 
+function assertFileContains(relativePath, pattern, description) {
+  const content = fs.readFileSync(path.join(root, relativePath), 'utf8')
+  if (!pattern.test(content)) {
+    fail(`${relativePath} is missing expected content: ${description}`)
+  }
+}
+
 function assertHasSourceCode() {
   const sourceDir = path.join(root, 'Source')
   const entries = fs.readdirSync(sourceDir, { withFileTypes: true })
@@ -83,6 +90,18 @@ function assertDocsSurface() {
   }
 }
 
+function assertRepoPolishDetails() {
+  assertFileContains('README.md', /README\.ja\.md/, 'Japanese language switch link')
+  assertFileContains('README.md', /https:\/\/sunwood-ai-labs\.github\.io\/TimberBoostControl\//, 'published docs link')
+  assertFileContains('README.ja.md', /README\.md/, 'English language switch link')
+  assertFileContains('docs/index.md', /\/getting-started/, 'English getting started action')
+  assertFileContains('docs\/ja\/index.md', /\/ja\/getting-started/, 'Japanese getting started action')
+  assertFileContains('docs/.vitepress/config.mts', /\/TimberBoostControl\//, 'GitHub Pages base path')
+  assertFileContains('.github/workflows/deploy-docs.yml', /actions\/deploy-pages@v4/, 'GitHub Pages deploy action')
+  assertFileContains('.github/workflows/deploy-docs.yml', /docs\/\.vitepress\/dist/, 'Pages artifact path')
+  assertFileContains('.github/workflows/ci.yml', /npm run validate/, 'combined repository QA command')
+}
+
 function main() {
   console.log('[project-validate] checking repository layout')
   mustExist('README.md')
@@ -102,6 +121,7 @@ function main() {
   assertManifestJson()
   assertWorkflowFiles()
   assertDocsSurface()
+  assertRepoPolishDetails()
   console.log('[project-validate] repository structure is valid')
 }
 

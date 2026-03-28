@@ -10,7 +10,7 @@
     "docs:dev": "vitepress dev docs --host 0.0.0.0",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs --host 0.0.0.0",
-    "validate": "npm run validate:project && npm run lint:repo && npm run lint:md && npm run docs:build"
+    "validate": "npm run validate:project && npm run lint:md && npm run docs:build"
   },
   "devDependencies": {
     "markdownlint-cli2": "0.15.0",
