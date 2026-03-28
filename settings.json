@@ -1,7 +1,7 @@
 {
-  "CarryMultiplier": 10,
-  "MoveSpeedPercent": 200,
-  "StorageMultiplier": 10,
+  "CarryMultiplier": 100,
+  "MoveSpeedPercent": 500,
+  "StorageMultiplier": 100,
   "BuildCostPercent": 10,
   "ScienceCostPercent": 0,
   "FactoryWorkerMultiplier": 2,
