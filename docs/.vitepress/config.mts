@@ -53,14 +53,14 @@ export default defineConfig({
   cleanUrls: true,
   lastUpdated: true,
   head: [
-    ['link', { rel: 'icon', href: '/TimberBoostControl/brand/boost-emblem.svg' }],
+    ['link', { rel: 'icon', href: '/TimberBoostControl/boost-icon.png' }],
     ['meta', { name: 'theme-color', content: '#17392f' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:title', content: 'TimberBoostControl' }],
     ['meta', { property: 'og:description', content: 'Blueprint-driven Timberborn boosts with a reloadable settings.json workflow.' }]
   ],
   themeConfig: {
-    logo: '/brand/boost-emblem.svg',
+    logo: '/boost-icon.png',
     search: {
       provider: 'local'
     },

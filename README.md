@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./docs/public/brand/boost-emblem.svg" alt="TimberBoostControl emblem" width="156" />
+  <img src="./Assets/UI/boost-icon.png" alt="TimberBoostControl boost icon" width="156" />
   <h1>TimberBoostControl</h1>
   <p><strong>A Timberborn DLL mod that reloads <code>settings.json</code> and regenerates blueprint boosts from a bottom-bar workflow.</strong></p>
 </div>

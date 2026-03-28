@@ -6,8 +6,8 @@ hero:
   text: Timberborn 用の JSON 駆動ブースト MOD
   tagline: bottom bar のパネルから状態を確認し、settings.json の再読み込みで blueprint override を再生成できる DLL MOD です。
   image:
-    src: /brand/boost-emblem.svg
-    alt: TimberBoostControl emblem
+    src: /boost-icon.png
+    alt: TimberBoostControl boost icon
   actions:
     - theme: brand
       text: 導入ガイド

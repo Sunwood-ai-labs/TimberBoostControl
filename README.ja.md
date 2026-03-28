@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./docs/public/brand/boost-emblem.svg" alt="TimberBoostControl emblem" width="156" />
+  <img src="./Assets/UI/boost-icon.png" alt="TimberBoostControl boost icon" width="156" />
   <h1>TimberBoostControl</h1>
   <p><strong>bottom bar から <code>settings.json</code> を再読み込みし、blueprint boost を再生成できる Timberborn DLL MOD です。</strong></p>
 </div>

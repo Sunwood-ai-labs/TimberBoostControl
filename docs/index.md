@@ -6,8 +6,8 @@ hero:
   text: JSON-driven blueprint boosts for Timberborn
   tagline: A DLL-based Timberborn mod that exposes its state through a bottom-bar panel and regenerates blueprint overrides from settings.json.
   image:
-    src: /brand/boost-emblem.svg
-    alt: TimberBoostControl emblem
+    src: /boost-icon.png
+    alt: TimberBoostControl boost icon
   actions:
     - theme: brand
       text: Get Started
